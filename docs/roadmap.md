@@ -34,8 +34,16 @@
 | [ ] | P1 | testing | unit-test | 补齐单元测试基础 | JUnit、MockK |
 | [ ] | P1 | observability | crash | 建立崩溃分析思路 | 堆栈、符号表、复现 |
 | [ ] | P1 | release | gray-release | 理解灰度和回滚 | 发布策略和风险控制 |
+| [ ] | P1 | debugging | android-debugging | 掌握 Android 调试方法 | 断点、日志、ADB、抓包 |
+| [ ] | P1 | code-quality | code-review | 建立代码质量检查清单 | 可读性、可维护性、坏味道 |
+| [ ] | P1 | dependency-management | conflict | 掌握依赖冲突排查 | 依赖树、BOM、版本收敛 |
+| [ ] | P1 | third-party-libraries | common-libraries | 整理常用三方库实践 | Glide、MMKV、LeakCanary |
+| [ ] | P1 | api-design | pagination-error-code | 理解接口设计约定 | 分页、错误码、幂等、兼容 |
 | [ ] | P2 | compose | state | 学习 Compose 状态管理 | remember、State、ViewModel |
 | [ ] | P2 | flutter | widget | 熟悉 Flutter Widget 体系 | StatelessWidget、StatefulWidget |
 | [ ] | P2 | ai | prompt | 整理 AI 辅助开发经验 | Prompt 模板、代码审查 |
+| [ ] | P2 | privacy-compliance | permission-sdk | 整理隐私和 SDK 合规 | 权限、隐私政策、市场审核 |
+| [ ] | P2 | ndk | jni-basic | 学习 NDK 和 JNI 基础 | Native 崩溃、SO、CMake |
+| [ ] | P2 | system-design | app-system-design | 梳理客户端系统设计 | 登录态、缓存、配置、灰度 |
 | [ ] | P2 | source-reading | okhttp | 开始源码阅读记录 | 责任链、连接池、缓存 |
 | [ ] | P2 | interview | project | 整理项目亮点和复盘 | 技术方案、难点、收益 |
