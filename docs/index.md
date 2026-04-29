@@ -26,7 +26,7 @@
 | [Git](./git/) | 记录 Git 版本管理知识，覆盖分支、merge、rebase、stash、cherry-pick 和团队工作流。 | 0 |
 | [Gradle](./gradle/) | 记录 Gradle 和 Android Gradle Plugin 知识，覆盖基础语法、AGP、插件、依赖和构建缓存。 | 0 |
 | [Interview](./interview/) | 记录面试整理内容，覆盖 Android、Kotlin、Java、JVM 和项目问题。 | 0 |
-| [Java](./java/) | 记录 Java 基础和进阶知识，覆盖集合、IO、反射、注解、泛型和异常机制。 | 0 |
+| [Java](./java/) | 记录 Java 基础和进阶知识，覆盖集合、IO、反射、注解、泛型和异常机制。 | 8 |
 | [Jetpack](./jetpack/) | 记录 Jetpack 组件知识，覆盖 Lifecycle、ViewModel、Navigation、Paging、WorkManager 和 Hilt。 | 0 |
 | [JVM](./jvm/) | 记录 JVM、ART、类加载、内存模型、GC、字节码等底层知识，用于支撑 Java、Kotlin、Android 性能优化和面试复盘。 | 0 |
 | [Kotlin](./kotlin/) | 记录 Kotlin 语言知识，覆盖基础语法、泛型、委托、DSL 和高级特性。 | 0 |

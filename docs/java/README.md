@@ -1,4 +1,4 @@
-# Java
+﻿# Java
 
 ## 模块说明
 
@@ -6,12 +6,15 @@
 
 ## 导航
 
-- 集合
-- IO
-- 反射
-- 注解
-- 泛型
-- 异常
+- [Java 集合](./collections.md)
+- [Java 异常](./exception.md)
+- [Java 泛型](./generic.md)
+- [Java 基础](./java-basic.md)
+- [Java 基础笔记 Review](./java-knowledge-review.md)
+- [Java 面向对象](./oop.md)
+- [Java String](./string.md)
+- [Java 线程](./thread.md)
+
 
 ## 学习重点
 
@@ -26,3 +29,4 @@
 - [ ] ArrayList 和 LinkedList 区别
 - [ ] Java 反射
 - [ ] 泛型擦除
+

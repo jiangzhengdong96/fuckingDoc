@@ -19,6 +19,9 @@
 | [ ] | P0 | kotlin | basic | 熟悉 Kotlin 核心语法 | 空安全、扩展函数、data class |
 | [ ] | P0 | coroutine | basic | 理解协程基础用法 | launch、async、withContext |
 | [ ] | P0 | java | collection | 掌握集合源码和使用场景 | HashMap、ArrayList、LinkedList |
+| [ ] | P0 | java | generic | 理解 Java 泛型 | 类型擦除、通配符、PECS |
+| [ ] | P0 | java | thread | 掌握 Java 线程基础 | Thread、Runnable、生命周期 |
+| [ ] | P0 | java | string | 掌握 String 核心机制 | 不可变、常量池、StringBuilder |
 | [ ] | P0 | jvm | memory | 理解 JVM 内存区域 | 栈、堆、方法区、PC |
 | [ ] | P0 | jvm | gc | 理解 GC 原理 | GC Roots、引用类型、回收算法 |
 | [ ] | P0 | concurrency | thread | 掌握线程和线程安全基础 | synchronized、volatile、锁 |
@@ -27,6 +30,8 @@
 | [ ] | P0 | performance | startup | 掌握启动优化 | 冷启动、懒加载、异步初始化 |
 | [ ] | P0 | network | okhttp | 掌握 OkHttp 使用和拦截器 | 缓存、重试、日志 |
 | [ ] | P1 | architecture | mvvm | 梳理 MVVM 实践 | ViewModel、Repository、状态管理 |
+| [ ] | P1 | java | exception | 梳理 Java 异常体系 | Throwable、throw/throws、finally |
+| [ ] | P1 | java | oop | 梳理 Java 面向对象 | 继承、多态、接口、抽象类 |
 | [ ] | P1 | design-patterns | creational | 掌握创建型设计模式 | 单例、工厂、建造者 |
 | [ ] | P1 | database | room | 掌握 Room 基础和迁移 | Entity、Dao、Migration |
 | [ ] | P1 | gradle | dependency | 理解 Gradle 依赖管理 | implementation、api、版本冲突 |
