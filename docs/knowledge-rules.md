@@ -15,28 +15,22 @@
 
 ## 命名规则
 
-- 目录和文件名使用英文小写加短横线，例如 `activity-lifecycle.md`。
+- 目录名优先使用英文小写加短横线，例如 `android-framework/`。
+- 笔记文件名允许中文或英文，多个词之间用短横线，例如 `java基础.md`、`java基础-总结.md`、`activity-lifecycle.md`。
 - 标题使用中文，例如 `# Activity 生命周期`。
-- 如果标题是中文，创建文件时需要提供英文 `Slug`。
 - 图片和截图放到 `assets/`，按模块继续建子目录。
 
 ## 笔记类型和模板
 
-| 类型 | 参数值 | 模板 |
-|---|---|---|
-| 普通知识点 | `topic` | `templates/topic-template.md` |
-| 问题排查 | `troubleshooting` | `templates/troubleshooting-template.md` |
-| 源码阅读 | `source-reading` | `templates/source-reading-template.md` |
-| 面试知识点 | `interview` | `templates/interview-template.md` |
-| 学习记录 | `learning-record` | `templates/learning-record-template.md` |
+| 类型    | 参数值               | 模板                                      |
+| ----- | ----------------- | --------------------------------------- |
+| 普通知识点 | `topic`           | `templates/topic-template.md`           |
+| 问题排查  | `troubleshooting` | `templates/troubleshooting-template.md` |
+| 源码阅读  | `source-reading`  | `templates/source-reading-template.md`  |
+| 面试知识点 | `interview`       | `templates/interview-template.md`       |
+| 学习记录  | `learning-record` | `templates/learning-record-template.md` |
 
 ## 创建笔记流程
-
-创建前先查重：
-
-- 搜索相似标题、slug 和关键词。
-- 如果已有笔记能承载当前内容，优先追加或整理已有笔记。
-- 如果确实是独立知识点，再创建新笔记。
 
 优先使用脚本创建笔记：
 
@@ -82,28 +76,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\update-index.ps1
 - 更新 `docs/index.md` 的模块表。
 - 不修改正文内容。
 
-## 质量检查规则
-
-新增、移动、删除或整理笔记后运行：
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-knowledge.ps1
-```
-
-检查内容：
-
-- 每个一级目录都有 `README.md`。
-- 模块 README 包含“模块说明 / 导航 / 学习重点 / 待整理”。
-- Markdown 文件有一级标题。
-- 本地 Markdown 链接能解析。
-- Markdown 文件名符合英文小写短横线规则。
-
-## Roadmap 和学习记录联动
-
-新增知识点后，如果对应主题已经在 `docs/roadmap.md` 中，询问是否标记为学习中或已完成。
-
-新增知识点后，可以询问是否创建学习记录。用户同意后，在 `docs/learning-records/` 中创建学习记录，并在记录中链接回知识点。
-
 ## AI 生成内容规则
 
 当只需要创建 Markdown 文件时，先使用模板生成空骨架。
@@ -133,14 +105,3 @@ docs/coroutine/
   coroutine-exception.md
   flow-basic.md
 ```
-
-## 模块补充说明
-
-- `third-party-libraries/`：三方库使用、接入、升级和实践。
-- `code-quality/`：代码规范、重构、Code Review 和可维护性。
-- `debugging/`：调试方法论和工具技巧。
-- `dependency-management/`：依赖治理、版本冲突、BOM 和升级策略。
-- `privacy-compliance/`：权限、隐私、SDK 和应用市场合规。
-- `ndk/`：JNI、C/C++、Native 崩溃、SO 和交叉编译。
-- `api-design/`：接口设计、错误码、分页、幂等和兼容性。
-- `system-design/`：登录态、缓存、消息、配置、离线和灰度系统设计。

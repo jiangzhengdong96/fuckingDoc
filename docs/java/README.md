@@ -2,31 +2,27 @@
 
 ## 模块说明
 
-记录 Java 基础和进阶知识，覆盖集合、IO、反射、注解、泛型和异常机制。
+记录 Java 基础和进阶知识。当前 Java 目录按用途拆成“知识点梳理、面试、问题集”三类，根目录只保留总入口和总导航。
 
 ## 导航
 
-- [Java 集合](./collections.md)
-- [Java 异常](./exception.md)
-- [Java 泛型](./generic.md)
-- [Java 基础](./java-basic.md)
-- [Java 基础笔记 Review](./java-knowledge-review.md)
-- [Java 面向对象](./oop.md)
-- [Java String](./string.md)
-- [Java 线程](./thread.md)
+- [Java 总结](./java总结.md)
+- [Java 面试](./面试/)
+- [Java 问题集](./问题集/)
+- [Java 知识点梳理](./知识点梳理/)
 
 
 ## 学习重点
 
-- 常见集合的数据结构和使用场景
-- Java IO 和 NIO 基础
-- 反射与注解的使用
-- 泛型擦除和异常处理机制
+- Java 基础语法、类型、变量、方法、异常和面向对象
+- 集合、线程、泛型、String 等高频专题
+- 面试题和知识点之间互相引用
+- 问题集用于记录待确认、易错和复盘问题
 
 ## 待整理
 
-- [ ] HashMap 原理
-- [ ] ArrayList 和 LinkedList 区别
-- [ ] Java 反射
-- [ ] 泛型擦除
+- [ ] IO / NIO
+- [ ] 反射
+- [ ] 注解
+- [ ] Lambda / Stream
 

@@ -53,8 +53,8 @@ Get-ChildItem -LiteralPath $docsDir -Directory | ForEach-Object {
 Get-ChildItem -LiteralPath $docsDir -Recurse -File -Filter '*.md' | ForEach-Object {
     $currentFile = $_.FullName
     $name = $_.Name
-    if ($name -ne 'README.md' -and $name -notmatch '^[a-z0-9]+([-.][a-z0-9]+)*\.md$') {
-        Add-Issue -Issues $issues -Message "Markdown file name should be lowercase kebab-case: $currentFile"
+    if ($name -ne 'README.md' -and $name -notmatch '^[\p{L}\p{Nd}]+([-.][\p{L}\p{Nd}]+)*\.md$') {
+        Add-Issue -Issues $issues -Message "Markdown file name should use readable letters/numbers with hyphen or dot separators: $currentFile"
     }
 
     $content = Get-Content -Raw -Encoding UTF8 -LiteralPath $currentFile

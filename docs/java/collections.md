@@ -14,12 +14,12 @@ Java 集合是用于组织和操作一组对象的标准 API，核心分为 `Col
 
 ## 核心概念
 
-| 类型 | 常见实现 | 特点 |
-|---|---|---|
-| `List` | `ArrayList`、`LinkedList` | 有序、可重复 |
-| `Set` | `HashSet`、`LinkedHashSet`、`TreeSet` | 不重复 |
-| `Map` | `HashMap`、`LinkedHashMap`、`TreeMap`、`ConcurrentHashMap` | key-value |
-| `Queue` | `ArrayDeque`、`PriorityQueue` | 队列或优先级队列 |
+| 类型      | 常见实现                                                    | 特点        |
+| ------- | ------------------------------------------------------- | --------- |
+| `List`  | `ArrayList`、`LinkedList`                                | 有序、可重复    |
+| `Set`   | `HashSet`、`LinkedHashSet`、`TreeSet`                     | 不重复       |
+| `Map`   | `HashMap`、`LinkedHashMap`、`TreeMap`、`ConcurrentHashMap` | key-value |
+| `Queue` | `ArrayDeque`、`PriorityQueue`                            | 队列或优先级队列  |
 
 ## 关键问题
 

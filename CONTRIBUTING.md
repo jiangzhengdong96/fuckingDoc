@@ -4,11 +4,11 @@
 
 ## 基本要求
 
-- 目录和文件名使用英文小写加短横线，例如 `activity-lifecycle.md`。
+- 目录名优先使用英文小写加短横线，例如 `android-framework/`。
+- 笔记文件名允许中文或英文，多个词之间用短横线，例如 `java基础.md`、`java基础-总结.md`、`activity-lifecycle.md`。
 - 正文使用中文。
 - 新增知识点时优先使用 `scripts/new-note.ps1` 创建文件。
 - 新增、移动或删除笔记后运行 `scripts/update-index.ps1`。
-- 提交前运行 `scripts/check-knowledge.ps1` 做结构和链接检查。
 - 如果 PowerShell 执行策略禁止直接运行脚本，使用 `powershell -NoProfile -ExecutionPolicy Bypass -File ...`。
 - 单篇笔记保持聚焦；内容变长时拆成多个知识点文件或专题目录。
 
@@ -19,12 +19,3 @@
 - 源码阅读：`templates/source-reading-template.md`
 - 面试知识点：`templates/interview-template.md`
 - 学习记录：`templates/learning-record-template.md`
-
-## 新增前检查
-
-新增笔记前先查重。优先复用已有笔记；只有当前内容确实是独立知识点时再新建。
-
-创建知识点后，可以按需同步：
-
-- `docs/roadmap.md`：标记学习中或已完成。
-- `docs/learning-records/`：记录这次学习过程。

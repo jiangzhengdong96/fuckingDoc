@@ -37,7 +37,7 @@ When the user asks to create a note:
 2. Determine the note type.
 3. Search for similar existing notes by title, slug, and nearby keywords.
 4. If a similar note exists, ask whether to append/organize the existing note or create a separate note.
-5. Generate an English lowercase kebab-case slug.
+5. Generate a readable slug using Chinese or English based on the user's requested naming style. Chinese note names such as `java基础` and `java基础-总结` are allowed; English kebab-case is still preferred for broad technical directories.
 6. Create the note with `scripts/new-note.ps1`.
 7. Let the script update `docs/index.md` and module navigation.
 8. Ask whether to generate substantial knowledge content if the user did not explicitly request it.
@@ -98,7 +98,7 @@ Before final response after creating, moving, or deleting notes, run:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-knowledge.ps1
 ```
 
-The check verifies module README structure, level-1 headings, local Markdown links, and lowercase kebab-case file names.
+The check verifies module README structure, level-1 headings, local Markdown links, and readable Markdown file names.
 
 If the check fails, fix issues that are part of the current task. If the failure comes from unrelated existing user work, report it clearly and do not rewrite unrelated content.
 

@@ -30,7 +30,7 @@ function Convert-ToSlug {
 
     $slugValue = $Value.ToLowerInvariant()
     $slugValue = $slugValue -replace '\s+', '-'
-    $slugValue = $slugValue -replace '[^a-z0-9\-]', ''
+    $slugValue = $slugValue -replace '[^\p{L}\p{Nd}\-]', ''
     $slugValue = $slugValue -replace '-+', '-'
     $slugValue = $slugValue.Trim('-')
     return $slugValue
@@ -112,7 +112,7 @@ if ([string]::IsNullOrWhiteSpace($Slug)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($Slug)) {
-    throw 'Slug is required when Title cannot be converted to an ASCII file name.'
+    throw 'Slug is required when Title cannot be converted to a readable file name.'
 }
 
 $templatePath = Get-TemplatePath -RepoRoot $repoRoot -NoteType $Type
