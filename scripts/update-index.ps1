@@ -18,11 +18,11 @@ function Get-MarkdownTitle {
     }
 
     $heading = Get-Content -Encoding UTF8 -LiteralPath $Path |
-        Where-Object { $_ -match '^#\s+' } |
+        Where-Object { $_ -match '^#{1,6}\s+' } |
         Select-Object -First 1
 
     if ($heading) {
-        return ($heading -replace '^#\s+', '').Trim()
+        return ($heading -replace '^#{1,6}\s+', '').Trim()
     }
 
     return [System.IO.Path]::GetFileNameWithoutExtension($Path)
@@ -36,8 +36,8 @@ function Get-ModuleDescription {
     }
 
     $text = Get-Content -Raw -Encoding UTF8 -LiteralPath $ReadmePath
-    $heading = [regex]::Escape($script:ModuleDescriptionHeading)
-    $match = [regex]::Match($text, "(?s)$heading\s+(.+?)(\r?\n##\s+)")
+    $heading = [regex]::Escape($script:ModuleDescriptionTitle)
+    $match = [regex]::Match($text, "(?ms)^#{1,6}\s+$heading\s*\r?\n(.+?)(?=^#{1,6}\s+)")
     if ($match.Success) {
         return (($match.Groups[1].Value -replace '\r?\n', ' ').Trim())
     }
@@ -93,11 +93,11 @@ function Update-ModuleReadme {
     $navigation = ($items | ForEach-Object { "- [$($_.Title)]($($_.Link))" }) -join "`n"
     $content = Get-Content -Raw -Encoding UTF8 -LiteralPath $readmePath
 
-    $heading = [regex]::Escape($script:NavigationHeading)
-    $pattern = "(?s)($heading\s+).*?(\r?\n##\s+)"
+    $heading = [regex]::Escape($script:NavigationTitle)
+    $pattern = "(?ms)(^#{1,6}\s+$heading\s*\r?\n).*?(?=^#{1,6}\s+)"
     $updated = [regex]::Replace($content, $pattern, {
         param($match)
-        return $match.Groups[1].Value + $navigation + "`n`n" + $match.Groups[2].Value
+        return $match.Groups[1].Value + $navigation + "`n`n"
     }, 1)
 
     Set-Content -Encoding UTF8 -LiteralPath $readmePath -Value $updated
@@ -106,8 +106,8 @@ function Update-ModuleReadme {
 $repoRoot = Get-RepoRoot
 $docsDir = Join-Path $repoRoot 'docs'
 $indexPath = Join-Path $docsDir 'index.md'
-$script:ModuleDescriptionHeading = '## ' + (ConvertFrom-CodePoint @(0x6A21, 0x5757, 0x8BF4, 0x660E))
-$script:NavigationHeading = '## ' + (ConvertFrom-CodePoint @(0x5BFC, 0x822A))
+$script:ModuleDescriptionTitle = ConvertFrom-CodePoint @(0x6A21, 0x5757, 0x8BF4, 0x660E)
+$script:NavigationTitle = ConvertFrom-CodePoint @(0x5BFC, 0x822A)
 
 $modules = @(Get-ChildItem -LiteralPath $docsDir -Directory | Sort-Object Name)
 
@@ -127,7 +127,7 @@ $rows = foreach ($module in $modules) {
     "| [$title](./$($module.Name)/) | $description | $noteCount |"
 }
 
-$indexTitle = '# ' + (ConvertFrom-CodePoint -CodePoints @(0x5168, 0x5C40, 0x7D22, 0x5F15))
+$indexTitle = '### ' + (ConvertFrom-CodePoint -CodePoints @(0x5168, 0x5C40, 0x7D22, 0x5F15))
 $indexDescriptionPrefix = ConvertFrom-CodePoint -CodePoints @(0x8FD9, 0x91CC, 0x6309, 0x6A21, 0x5757, 0x6C47, 0x603B, 0x6280, 0x672F, 0x76EE, 0x5F55, 0x3002, 0x65B0, 0x589E, 0x3001, 0x79FB, 0x52A8, 0x6216, 0x5220, 0x9664, 0x7B14, 0x8BB0, 0x540E, 0xFF0C, 0x8FD0, 0x884C)
 $indexDescriptionSuffix = ConvertFrom-CodePoint -CodePoints @(0x81EA, 0x52A8, 0x5237, 0x65B0, 0x672C, 0x6587, 0x4EF6, 0x3002)
 $moduleHeader = ConvertFrom-CodePoint -CodePoints @(0x6A21, 0x5757)

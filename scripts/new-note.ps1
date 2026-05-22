@@ -60,8 +60,8 @@ function Set-TemplateTitle {
     )
 
     $lines = $Content -split "`r?`n"
-    if ($lines.Count -gt 0 -and $lines[0] -match '^# ') {
-        $lines[0] = "# $Title"
+    if ($lines.Count -gt 0 -and $lines[0] -match '^(#{1,6})\s+') {
+        $lines[0] = "$($Matches[1]) $Title"
     }
     return ($lines -join "`n")
 }
@@ -70,11 +70,11 @@ function Get-MarkdownTitle {
     param([string]$Path)
 
     $heading = Get-Content -Encoding UTF8 -LiteralPath $Path |
-        Where-Object { $_ -match '^#\s+' } |
+        Where-Object { $_ -match '^#{1,6}\s+' } |
         Select-Object -First 1
 
     if ($heading) {
-        return ($heading -replace '^#\s+', '').Trim()
+        return ($heading -replace '^#{1,6}\s+', '').Trim()
     }
 
     return [System.IO.Path]::GetFileNameWithoutExtension($Path)

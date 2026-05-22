@@ -1,6 +1,6 @@
-# Java 基础原始笔记
+### Java 基础原始笔记
 
-> 原始导入内容，仅作为备份保留；正式归纳请看 [Java 基础知识点清单](../java基础.md) 和 [Java 基础总结](../java基础-总结.md)。
+> 原始导入内容，仅作为备份保留；正式归纳请看 [Java 基础知识点清单](../知识点梳理/java基础.md) 和 [Java 基础总结](../java总结.md)。
 
 * ***基础语法：***
   
@@ -320,7 +320,7 @@ graph TD
 
   Java 处理异常的核心是 **捕获（try-catch）** 和 **抛出（throws/throw）**，优先掌握 try-catch 即可。
 
-##### 1. 捕获异常（try-catch-finally）
+###### 1. 捕获异常（try-catch-finally）
 
   不管异不异常finally都会执行，在try块中打开资源，在finally块中清理释放这些资源，try块中的局部变量和catch块中的局部变量（包括异常变量），以及finally中的局部变量，他们之间不可共享使用
 

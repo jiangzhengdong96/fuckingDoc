@@ -29,6 +29,23 @@ Choose the note type from the user's intent:
 | Interview-focused knowledge point or Q&A | `interview` | `templates/interview-template.md` |
 | Personal learning progress, review, daily or stage record | `learning-record` | `templates/learning-record-template.md` |
 
+## Template Style Rules
+
+- Keep the document title as the first Markdown heading, usually `### 标题`, so templates render with smaller titles. Repository scripts preserve the template heading level when replacing the title, and checks accept any Markdown heading level.
+- `topic` notes use a lightweight knowledge-column structure:
+  - `### 标题`
+  - `###### 内容概述`
+  - first-level column navigation only
+  - `###### 一级知识点栏目`
+  - `###### 面试可能怎么问`
+- In `topic` notes, only the user-defined knowledge columns are included in the first-level column navigation. Do not add every small subpoint to the navigation.
+- Content under a `topic` column can be bullet points, short paragraphs, tables, images, code blocks, or references.
+- When organizing user-provided raw notes into `topic` notes, preserve the user's original wording as much as possible and only do classification, light bullet formatting, and Markdown cleanup.
+- `interview` notes use question navigation plus `###### 面试题` sections. Each question section contains the answer, and can include principles or links to corresponding knowledge-point notes when useful.
+- `source-reading` notes stay focused on source description plus key code or pseudocode plus explanation.
+- `troubleshooting` notes are currently simple: symptom, cause, solution, review.
+- Do not expand lightweight templates into long article-style structures unless the user explicitly asks for a deeper article.
+
 ## Creation Workflow
 
 When the user asks to create a note:
@@ -86,7 +103,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\update-index.ps1
 The script refreshes:
 
 - `docs/index.md`
-- `## 导航` sections for modules that contain actual child notes or topic directories
+- `导航` sections for modules that contain actual child notes or topic directories, preserving the heading level used by the README
 
 Do not manually duplicate index logic unless the script fails. If it fails, fix the script or explain the blocker.
 
@@ -98,7 +115,7 @@ Before final response after creating, moving, or deleting notes, run:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-knowledge.ps1
 ```
 
-The check verifies module README structure, level-1 headings, local Markdown links, and readable Markdown file names.
+The check verifies module README structure, Markdown headings, local Markdown links, and readable Markdown file names.
 
 If the check fails, fix issues that are part of the current task. If the failure comes from unrelated existing user work, report it clearly and do not rewrite unrelated content.
 

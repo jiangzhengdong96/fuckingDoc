@@ -1,10 +1,10 @@
-# 知识库维护规则
+### 知识库维护规则
 
-## 目标
+###### 目标
 
 这个仓库用于记录 Android 开发工程师的长期技术积累。内容要方便检索、持续补充和复盘，不追求一次写满。
 
-## 目录分层
+###### 目录分层
 
 - `docs/<module>/README.md`：模块说明、导航、学习重点、待整理。
 - `docs/<module>/<note>.md`：具体知识点笔记。
@@ -13,14 +13,14 @@
 - `templates/`：笔记模板。
 - `scripts/`：创建笔记和更新索引的脚本。
 
-## 命名规则
+###### 命名规则
 
 - 目录名优先使用英文小写加短横线，例如 `android-framework/`。
 - 笔记文件名允许中文或英文，多个词之间用短横线，例如 `java基础.md`、`java基础-总结.md`、`activity-lifecycle.md`。
-- 标题使用中文，例如 `# Activity 生命周期`。
+- 标题使用中文。普通笔记和模块 `README.md` 都使用较小标题层级，例如 `### Activity 生命周期`。
 - 图片和截图放到 `assets/`，按模块继续建子目录。
 
-## 笔记类型和模板
+###### 笔记类型和模板
 
 | 类型    | 参数值               | 模板                                      |
 | ----- | ----------------- | --------------------------------------- |
@@ -30,7 +30,7 @@
 | 面试知识点 | `interview`       | `templates/interview-template.md`       |
 | 学习记录  | `learning-record` | `templates/learning-record-template.md` |
 
-## 创建笔记流程
+###### 创建笔记流程
 
 优先使用脚本创建笔记：
 
@@ -62,7 +62,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new-note.ps1 -Modu
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new-note.ps1 -Module learning-records -Title "协程学习记录" -Slug coroutine-learning -Type learning-record
 ```
 
-## 自动索引规则
+###### 自动索引规则
 
 新增、移动、删除笔记后运行：
 
@@ -72,11 +72,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\update-index.ps1
 
 脚本会：
 
-- 更新有实际子笔记的模块 `README.md` 的 `## 导航` 区域。
+- 更新有实际子笔记的模块 `README.md` 的 `导航` 区域，并保留当前标题层级。
 - 更新 `docs/index.md` 的模块表。
 - 不修改正文内容。
 
-## AI 生成内容规则
+###### AI 生成内容规则
 
 当只需要创建 Markdown 文件时，先使用模板生成空骨架。
 
@@ -87,7 +87,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\update-index.ps1
 - 技术结论尽量写清适用条件。
 - 面试内容区分“简答版”和“深入追问”。
 
-## 拆分规则
+###### 拆分规则
 
 一个 Markdown 文件只记录一个相对明确的知识点。出现下面情况时优先拆分：
 

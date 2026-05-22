@@ -23,16 +23,16 @@ $repoRoot = Get-RepoRoot
 $docsDir = Join-Path $repoRoot 'docs'
 $issues = New-Object System.Collections.ArrayList
 
-$moduleDescriptionHeading = '## ' + (ConvertFrom-CodePoint -CodePoints @(0x6A21, 0x5757, 0x8BF4, 0x660E))
-$navigationHeading = '## ' + (ConvertFrom-CodePoint -CodePoints @(0x5BFC, 0x822A))
-$learningFocusHeading = '## ' + (ConvertFrom-CodePoint -CodePoints @(0x5B66, 0x4E60, 0x91CD, 0x70B9))
-$todoHeading = '## ' + (ConvertFrom-CodePoint -CodePoints @(0x5F85, 0x6574, 0x7406))
+$moduleDescriptionTitle = ConvertFrom-CodePoint -CodePoints @(0x6A21, 0x5757, 0x8BF4, 0x660E)
+$navigationTitle = ConvertFrom-CodePoint -CodePoints @(0x5BFC, 0x822A)
+$learningFocusTitle = ConvertFrom-CodePoint -CodePoints @(0x5B66, 0x4E60, 0x91CD, 0x70B9)
+$todoTitle = ConvertFrom-CodePoint -CodePoints @(0x5F85, 0x6574, 0x7406)
 
-$requiredHeadings = @(
-    $moduleDescriptionHeading,
-    $navigationHeading,
-    $learningFocusHeading,
-    $todoHeading
+$requiredHeadingTitles = @(
+    $moduleDescriptionTitle,
+    $navigationTitle,
+    $learningFocusTitle,
+    $todoTitle
 )
 
 Get-ChildItem -LiteralPath $docsDir -Directory | ForEach-Object {
@@ -43,9 +43,10 @@ Get-ChildItem -LiteralPath $docsDir -Directory | ForEach-Object {
     }
 
     $content = Get-Content -Raw -Encoding UTF8 -LiteralPath $readmePath
-    foreach ($heading in $requiredHeadings) {
-        if ($content -notmatch [regex]::Escape($heading)) {
-            Add-Issue -Issues $issues -Message "Missing required section in $readmePath : $heading"
+    foreach ($headingTitle in $requiredHeadingTitles) {
+        $pattern = '(?m)^#{1,6}\s+' + [regex]::Escape($headingTitle) + '\s*$'
+        if ($content -notmatch $pattern) {
+            Add-Issue -Issues $issues -Message "Missing required section in $readmePath : $headingTitle"
         }
     }
 }
@@ -58,8 +59,8 @@ Get-ChildItem -LiteralPath $docsDir -Recurse -File -Filter '*.md' | ForEach-Obje
     }
 
     $content = Get-Content -Raw -Encoding UTF8 -LiteralPath $currentFile
-    if ($content -notmatch '(?m)^#\s+') {
-        Add-Issue -Issues $issues -Message "Markdown file has no level-1 heading: $currentFile"
+    if ($content -notmatch '(?m)^#{1,6}\s+') {
+        Add-Issue -Issues $issues -Message "Markdown file has no Markdown heading: $currentFile"
     }
 
     $dir = $_.DirectoryName
