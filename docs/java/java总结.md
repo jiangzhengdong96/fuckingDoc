@@ -54,7 +54,7 @@ docs/java/
 | [泛型面试题.md](./面试/泛型面试题.md)         | 类型擦除、通配符、PECS、泛型限制                              |
 | [String面试题.md](./面试/String面试题.md) | String 不可变、常量池、new String、intern                |
 | [异常面试题.md](./面试/异常面试题.md)         | 异常体系、throw/throws、finally、try-with-resources    |
-| [面向对象面试题.md](./面试/面向对象面试题.md)     | 重载/重写、接口/抽象类、多态、static 方法                       |
+| [面向对象面试题.md](./面试/面向对象面试题.md)     | 封装、继承、this/super、初始化顺序、重载/重写、多态、接口/抽象类 |
 
 ###### 问题集
 

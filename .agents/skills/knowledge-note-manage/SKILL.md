@@ -43,6 +43,9 @@ Choose the note type from the user's intent:
 - In `topic` notes, only the user-defined knowledge columns are included in the first-level column navigation. Do not add every small subpoint to the navigation.
 - Content under a `topic` column can be bullet points, short paragraphs, tables, images, code blocks, or references.
 - When organizing user-provided raw notes into `topic` notes, preserve the user's original wording as much as possible and only do classification, light bullet formatting, and Markdown cleanup.
+- When updating a `topic` knowledge note, scan for the matching interview note in the same module, for example `docs/java/知识点梳理/集合.md` -> `docs/java/面试/集合面试题.md`. If the topic gained new interview-worthy points, update the topic's `###### 面试可能怎么问` section and the matching interview note in the same task, unless the user explicitly says not to update interview content.
+- If no matching interview note exists but the topic is interview-worthy, create or offer to create the matching interview note depending on scope: create it when the user asked to update content broadly, ask first when the user only requested a narrow formatting or wording change.
+- The final response should mention whether related interview notes were scanned and updated, or list the missing interview notes that still need follow-up.
 - `interview` notes use question navigation plus `###### 面试题` sections. Each question section contains the answer, and can include principles or links to corresponding knowledge-point notes when useful.
 - `source-reading` notes stay focused on source description plus key code or pseudocode plus explanation.
 - `troubleshooting` notes are currently simple: symptom, cause, solution, review.
