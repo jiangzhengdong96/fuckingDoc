@@ -35,9 +35,11 @@ Choose the note type from the user's intent:
 - `topic` notes use a lightweight knowledge-column structure:
   - `### 标题`
   - `###### 内容概述`
+  - `###### 使用场景`
   - first-level column navigation only
   - `###### 一级知识点栏目`
   - `###### 面试可能怎么问`
+- `使用场景` briefly describes where the knowledge point appears in Android or day-to-day development. Keep it concise and avoid long examples unless the user asks.
 - In `topic` notes, only the user-defined knowledge columns are included in the first-level column navigation. Do not add every small subpoint to the navigation.
 - Content under a `topic` column can be bullet points, short paragraphs, tables, images, code blocks, or references.
 - When organizing user-provided raw notes into `topic` notes, preserve the user's original wording as much as possible and only do classification, light bullet formatting, and Markdown cleanup.

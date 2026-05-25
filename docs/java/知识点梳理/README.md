@@ -14,12 +14,19 @@
 ###### 导航
 
 - [Java 基础](./java基础.md)
+- [IO / NIO](./IO-NIO.md)
+- [Lambda / Stream / Optional](./Lambda-Stream-Optional.md)
 - [集合](./集合.md)
 - [线程](./线程.md)
 - [泛型](./泛型.md)
 - [String](./String.md)
 - [异常](./异常.md)
 - [面向对象](./面向对象.md)
+- [反射](./反射.md)
+- [注解](./注解.md)
+- [枚举](./枚举.md)
+- [日期时间](./日期时间.md)
+- [序列化](./序列化.md)
 
 ###### 学习重点
 
@@ -30,7 +37,7 @@
 
 ###### 待整理
 
-- [ ] IO / NIO
-- [ ] 反射
-- [ ] 注解
-- [ ] Lambda / Stream
+- [ ] 继续补充 IO / NIO 面试题和实践示例
+- [ ] 继续补充反射细节
+- [ ] 继续补充注解细节
+- [ ] 继续补充 Lambda / Stream / Optional 细节

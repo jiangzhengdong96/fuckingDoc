@@ -27,13 +27,20 @@ docs/java/
 
 | 文件                             | 内容                                             |
 | ------------------------------ | ---------------------------------------------- |
-| [java基础.md](./知识点梳理/java基础.md) | Java 基础语法、修饰符、变量、数据类型、异常、面向对象等总清单              |
-| [集合.md](./知识点梳理/集合.md)         | List、Set、Map、Queue、HashMap、ConcurrentHashMap   |
+| [java基础.md](./知识点梳理/java基础.md) | Java 基础语法、修饰符、变量、数据类型、运算符、包装器类、数组、正则、代码块、主方法、递归、GC、拷贝和值传递 |
+| [集合.md](./知识点梳理/集合.md)         | 集合体系、底层数据结构、List、Set、Map、Queue、Iterator、Collections、排序、Android 常见集合、常见坑 |
 | [线程.md](./知识点梳理/线程.md)         | Thread、Runnable、Callable、线程状态、线程安全             |
 | [泛型.md](./知识点梳理/泛型.md)         | 泛型类、泛型方法、通配符、上下界、类型擦除                          |
 | [String.md](./知识点梳理/String.md) | String 不可变、常量池、StringBuilder、StringBuffer      |
 | [异常.md](./知识点梳理/异常.md)         | Throwable、Error、Exception、throw、throws、finally |
 | [面向对象.md](./知识点梳理/面向对象.md)     | 封装、继承、多态、接口、抽象类、重载、重写                          |
+| [IO-NIO.md](./知识点梳理/IO-NIO.md) | IO 流分类、常用流、缓冲流、字符编码、File/Path/Files、RandomAccessFile、BIO/NIO/AIO 概念 |
+| [反射.md](./知识点梳理/反射.md) | Class 对象、构造方法、字段、方法调用、性能和安全边界 |
+| [注解.md](./知识点梳理/注解.md) | 元注解、运行时注解、编译期注解、APT |
+| [枚举.md](./知识点梳理/枚举.md) | 枚举字段、构造方法、抽象方法、单例 |
+| [Lambda-Stream-Optional.md](./知识点梳理/Lambda-Stream-Optional.md) | Java 8 现代基础 |
+| [日期时间.md](./知识点梳理/日期时间.md) | Date/Calendar 的问题，java.time 的推荐用法 |
+| [序列化.md](./知识点梳理/序列化.md) | Serializable、transient、serialVersionUID、Parcelable 对比 |
 
 ###### 面试题
 
@@ -41,7 +48,7 @@ docs/java/
 
 | 文件                                | 内容                                              |
 | --------------------------------- | ----------------------------------------------- |
-| [java基础面试题.md](./面试/java基础面试题.md) | Java 基础语法、变量、类型、值传递等问题                          |
+| [java基础面试题.md](./面试/java基础面试题.md) | 基础语法、修饰符、变量、类型转换、包装类、数组、代码块、GC、拷贝和值传递 |
 | [集合面试题.md](./面试/集合面试题.md)         | HashMap、ArrayList、HashSet、ConcurrentHashMap     |
 | [线程面试题.md](./面试/线程面试题.md)         | 线程状态、start/run、sleep/wait、volatile、synchronized |
 | [泛型面试题.md](./面试/泛型面试题.md)         | 类型擦除、通配符、PECS、泛型限制                              |
@@ -66,20 +73,20 @@ docs/java/
 | 阶段   | 目标                  | 入口                                                                   |
 | ---- | ------------------- | -------------------------------------------------------------------- |
 | 基础语法 | 能写出规范 Java 代码       | [java基础.md](./知识点梳理/java基础.md)                                       |
-| 常用类型 | 理解变量、数据类型、String、数组 | [java基础.md](./知识点梳理/java基础.md)、[String.md](./知识点梳理/String.md)        |
+| 常用类型 | 理解变量、数据类型、包装器类、String、数组 | [java基础.md](./知识点梳理/java基础.md)、[String.md](./知识点梳理/String.md)        |
 | 面向对象 | 理解继承、多态、接口和抽象类      | [面向对象.md](./知识点梳理/面向对象.md)                                           |
 | 异常处理 | 理解异常分类和处理方式         | [异常.md](./知识点梳理/异常.md)                                               |
+| IO/NIO | 理解文件读写、编码、缓冲和随机访问文件 | [IO-NIO.md](./知识点梳理/IO-NIO.md) |
 | 高频专题 | 掌握集合、线程、泛型          | [集合.md](./知识点梳理/集合.md)、[线程.md](./知识点梳理/线程.md)、[泛型.md](./知识点梳理/泛型.md) |
 | 面试复盘 | 用问答方式检查理解深度         | [面试](./面试/)                                                          |
 
 ###### 后续待补充
 
-- IO / NIO
-- 反射
-- 注解
-- 枚举
-- Lambda / Stream
-- Optional
+- IO / NIO 面试题和实践示例
+- 反射细节
+- 注解细节
+- 枚举细节
+- Lambda / Stream / Optional 细节
 - `Object` 常用方法
 - `equals` / `hashCode`
 - 日期时间 API
