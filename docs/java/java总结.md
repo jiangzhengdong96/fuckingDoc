@@ -29,14 +29,14 @@ docs/java/
 | ------------------------------ | ---------------------------------------------- |
 | [java基础.md](./知识点梳理/java基础.md) | Java 基础语法、修饰符、变量、数据类型、运算符、包装器类、数组、正则、代码块、主方法、递归、GC、拷贝和值传递 |
 | [集合.md](./知识点梳理/集合.md)         | 集合体系、底层数据结构、List、Set、Map、Queue、Iterator、Collections、排序、Android 常见集合、常见坑 |
-| [线程.md](./知识点梳理/线程.md)         | Thread、Runnable、Callable、线程状态、线程安全             |
-| [泛型.md](./知识点梳理/泛型.md)         | 泛型类、泛型方法、通配符、上下界、类型擦除                          |
+| [线程.md](./知识点梳理/线程.md)         | Thread、Runnable、Callable、线程状态、线程安全、synchronized、volatile、线程协作、中断、守护线程、Lock、并发工具、线程池、网络编程和线程、ThreadLocal、Android 主线程 |
+| [泛型.md](./知识点梳理/泛型.md)         | 泛型基础、泛型类和方法、泛型接口、通配符、类型擦除、泛型限制、泛型数组、泛型和反射、Android 泛型场景 |
 | [String.md](./知识点梳理/String.md) | String 不可变、常量池、StringBuilder、StringBuffer      |
 | [异常.md](./知识点梳理/异常.md)         | Throwable、Error、Exception、throw、throws、finally |
 | [面向对象.md](./知识点梳理/面向对象.md)     | 封装、继承、多态、接口、抽象类、重载、重写                          |
 | [IO-NIO.md](./知识点梳理/IO-NIO.md) | IO 流分类、常用流、缓冲流、字符编码、File/Path/Files、RandomAccessFile、BIO/NIO/AIO 概念 |
-| [反射.md](./知识点梳理/反射.md) | Class 对象、构造方法、字段、方法调用、性能和安全边界 |
-| [注解.md](./知识点梳理/注解.md) | 元注解、运行时注解、编译期注解、APT |
+| [反射.md](./知识点梳理/反射.md) | Class 对象、动态加载、ClassLoader、类信息、构造方法、字段和方法调用、注解和泛型反射、动态代理、Android 使用限制 |
+| [注解.md](./知识点梳理/注解.md) | 注解基础、注解参数、元注解、内置注解、运行时注解、编译期注解处理、Android 使用场景 |
 | [枚举.md](./知识点梳理/枚举.md) | 枚举字段、构造方法、抽象方法、单例 |
 | [Lambda-Stream-Optional.md](./知识点梳理/Lambda-Stream-Optional.md) | Java 8 现代基础 |
 | [日期时间.md](./知识点梳理/日期时间.md) | Date/Calendar 的问题，java.time 的推荐用法 |
@@ -50,11 +50,13 @@ docs/java/
 | --------------------------------- | ----------------------------------------------- |
 | [java基础面试题.md](./面试/java基础面试题.md) | 基础语法、修饰符、变量、类型转换、包装类、数组、代码块、GC、拷贝和值传递 |
 | [集合面试题.md](./面试/集合面试题.md)         | HashMap、ArrayList、HashSet、ConcurrentHashMap     |
-| [线程面试题.md](./面试/线程面试题.md)         | 线程状态、start/run、sleep/wait、volatile、synchronized |
-| [泛型面试题.md](./面试/泛型面试题.md)         | 类型擦除、通配符、PECS、泛型限制                              |
+| [线程面试题.md](./面试/线程面试题.md)         | start/run、线程状态、sleep/wait、synchronized、volatile、wait/notify、中断、守护线程、Lock、Atomic、线程池、网络编程和线程、ThreadLocal、Android 主线程 |
+| [泛型面试题.md](./面试/泛型面试题.md)         | 类型擦除、泛型继承、通配符、PECS、泛型限制、静态泛型方法、泛型数组、raw type、Android 泛型场景 |
 | [String面试题.md](./面试/String面试题.md) | String 不可变、常量池、new String、intern                |
 | [异常面试题.md](./面试/异常面试题.md)         | 异常体系、throw/throws、finally、try-with-resources    |
 | [面向对象面试题.md](./面试/面向对象面试题.md)     | 封装、继承、this/super、初始化顺序、重载/重写、多态、接口/抽象类 |
+| [反射面试题.md](./面试/反射面试题.md) | Class 对象、动态加载、ClassLoader、对象创建、字段和方法调用、注解、泛型反射、动态代理、Android 限制 |
+| [注解面试题.md](./面试/注解面试题.md) | 元注解、保留策略、运行时读取、编译期处理、Android 注解场景 |
 
 ###### 问题集
 
@@ -83,8 +85,6 @@ docs/java/
 ###### 后续待补充
 
 - IO / NIO 面试题和实践示例
-- 反射细节
-- 注解细节
 - 枚举细节
 - Lambda / Stream / Optional 细节
 - `Object` 常用方法
