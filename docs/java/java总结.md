@@ -37,10 +37,10 @@ docs/java/
 | [IO-NIO.md](./知识点梳理/IO-NIO.md) | IO 流分类、常用流、缓冲流、字符编码、File/Path/Files、RandomAccessFile、BIO/NIO/AIO 概念 |
 | [反射.md](./知识点梳理/反射.md) | Class 对象、动态加载、ClassLoader、类信息、构造方法、字段和方法调用、注解和泛型反射、动态代理、Android 使用限制 |
 | [注解.md](./知识点梳理/注解.md) | 注解基础、注解参数、元注解、内置注解、运行时注解、编译期注解处理、Android 使用场景 |
-| [枚举.md](./知识点梳理/枚举.md) | 枚举字段、构造方法、抽象方法、单例 |
-| [Lambda-Stream-Optional.md](./知识点梳理/Lambda-Stream-Optional.md) | Java 8 现代基础 |
+| [枚举.md](./知识点梳理/枚举.md) | 枚举基础、字段和方法、构造方法、抽象方法、EnumSet、EnumMap、枚举单例、Android 使用场景 |
+| [Lambda-Stream-Optional.md](./知识点梳理/Lambda-Stream-Optional.md) | Lambda、函数式接口、方法引用、Stream、Optional、Android 使用场景 |
 | [日期时间.md](./知识点梳理/日期时间.md) | Date/Calendar 的问题，java.time 的推荐用法 |
-| [序列化.md](./知识点梳理/序列化.md) | Serializable、transient、serialVersionUID、Parcelable 对比 |
+| [序列化.md](./知识点梳理/序列化.md) | 序列化基础、Serializable、transient、serialVersionUID、自定义序列化、Parcelable 对比、Android 使用场景 |
 
 ###### 面试题
 
@@ -57,6 +57,9 @@ docs/java/
 | [面向对象面试题.md](./面试/面向对象面试题.md)     | 封装、继承、this/super、初始化顺序、重载/重写、多态、接口/抽象类 |
 | [反射面试题.md](./面试/反射面试题.md) | Class 对象、动态加载、ClassLoader、对象创建、字段和方法调用、注解、泛型反射、动态代理、Android 限制 |
 | [注解面试题.md](./面试/注解面试题.md) | 元注解、保留策略、运行时读取、编译期处理、Android 注解场景 |
+| [枚举面试题.md](./面试/枚举面试题.md) | 枚举优势、本质、字段和构造方法、ordinal 风险、EnumSet、EnumMap、枚举单例、Android IntDef |
+| [序列化面试题.md](./面试/序列化面试题.md) | Serializable、transient、serialVersionUID、反序列化构造方法、Parcelable、安全风险 |
+| [Lambda-Stream-Optional面试题.md](./面试/Lambda-Stream-Optional面试题.md) | Lambda、函数式接口、方法引用、Stream 中间操作和终止操作、Optional、Android 兼容 |
 
 ###### 问题集
 
@@ -80,15 +83,14 @@ docs/java/
 | 异常处理 | 理解异常分类和处理方式         | [异常.md](./知识点梳理/异常.md)                                               |
 | IO/NIO | 理解文件读写、编码、缓冲和随机访问文件 | [IO-NIO.md](./知识点梳理/IO-NIO.md) |
 | 高频专题 | 掌握集合、线程、泛型          | [集合.md](./知识点梳理/集合.md)、[线程.md](./知识点梳理/线程.md)、[泛型.md](./知识点梳理/泛型.md) |
+| 现代语法 | 理解 Lambda、Stream、Optional 的使用边界 | [Lambda-Stream-Optional.md](./知识点梳理/Lambda-Stream-Optional.md) |
+| 进阶特性 | 理解反射、注解、枚举和序列化的边界 | [反射.md](./知识点梳理/反射.md)、[注解.md](./知识点梳理/注解.md)、[枚举.md](./知识点梳理/枚举.md)、[序列化.md](./知识点梳理/序列化.md) |
 | 面试复盘 | 用问答方式检查理解深度         | [面试](./面试/)                                                          |
 
 ###### 后续待补充
 
 - IO / NIO 面试题和实践示例
-- 枚举细节
-- Lambda / Stream / Optional 细节
 - `Object` 常用方法
 - `equals` / `hashCode`
 - 日期时间 API
-- 序列化
 - 类加载基础
