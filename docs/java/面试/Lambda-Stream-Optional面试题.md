@@ -21,6 +21,7 @@
 - [Optional 能不能完全替代 null](#optional-能不能完全替代-null)
 - [Android 低版本使用 Stream 和 Optional 要注意什么](#android-低版本使用-stream-和-optional-要注意什么)
 
+<a id="lambda-表达式解决了什么问题"></a>
 ###### Lambda 表达式解决了什么问题
 
 答案：
@@ -33,6 +34,7 @@
 
 **关联知识点：** [Lambda 基础](../知识点梳理/Lambda-Stream-Optional.md#lambda-基础)
 
+<a id="lambda-和匿名内部类有什么区别"></a>
 ###### Lambda 和匿名内部类有什么区别
 
 答案：
@@ -45,6 +47,7 @@
 
 **关联知识点：** [Lambda 基础](../知识点梳理/Lambda-Stream-Optional.md#lambda-基础)
 
+<a id="什么是函数式接口"></a>
 ###### 什么是函数式接口
 
 答案：
@@ -57,6 +60,7 @@
 
 **关联知识点：** [函数式接口](../知识点梳理/Lambda-Stream-Optional.md#函数式接口)
 
+<a id="方法引用是什么"></a>
 ###### 方法引用是什么
 
 答案：
@@ -69,6 +73,7 @@
 
 **关联知识点：** [方法引用](../知识点梳理/Lambda-Stream-Optional.md#方法引用)
 
+<a id="stream-和集合遍历有什么区别"></a>
 ###### Stream 和集合遍历有什么区别
 
 答案：
@@ -81,6 +86,7 @@
 
 **关联知识点：** [Stream 基础](../知识点梳理/Lambda-Stream-Optional.md#stream-基础)
 
+<a id="stream-的中间操作和终止操作有什么区别"></a>
 ###### Stream 的中间操作和终止操作有什么区别
 
 答案：
@@ -93,6 +99,7 @@
 
 **关联知识点：** [Stream 基础](../知识点梳理/Lambda-Stream-Optional.md#stream-基础)
 
+<a id="map-和-flatmap-有什么区别"></a>
 ###### map 和 flatMap 有什么区别
 
 答案：
@@ -105,6 +112,7 @@
 
 **关联知识点：** [Stream 常用操作](../知识点梳理/Lambda-Stream-Optional.md#stream-常用操作)
 
+<a id="foreach-和-peek-有什么区别"></a>
 ###### forEach 和 peek 有什么区别
 
 答案：
@@ -117,6 +125,7 @@
 
 **关联知识点：** [Stream 常用操作](../知识点梳理/Lambda-Stream-Optional.md#stream-常用操作)
 
+<a id="findfirst-和-findany-有什么区别"></a>
 ###### findFirst 和 findAny 有什么区别
 
 答案：
@@ -129,6 +138,7 @@
 
 **关联知识点：** [Stream 常用操作](../知识点梳理/Lambda-Stream-Optional.md#stream-常用操作)
 
+<a id="parallelstream-为什么在-android-中慎用"></a>
 ###### parallelStream 为什么在 Android 中慎用
 
 答案：
@@ -141,6 +151,7 @@
 
 **关联知识点：** [Android 使用场景和注意点](../知识点梳理/Lambda-Stream-Optional.md#android-使用场景和注意点)
 
+<a id="optional-解决了什么问题"></a>
 ###### Optional 解决了什么问题
 
 答案：
@@ -153,6 +164,7 @@
 
 **关联知识点：** [Optional 基础](../知识点梳理/Lambda-Stream-Optional.md#optional-基础)
 
+<a id="orelse-和-orelseget-有什么区别"></a>
 ###### orElse 和 orElseGet 有什么区别
 
 答案：
@@ -165,6 +177,7 @@
 
 **关联知识点：** [Optional 基础](../知识点梳理/Lambda-Stream-Optional.md#optional-基础)
 
+<a id="optional-能不能完全替代-null"></a>
 ###### Optional 能不能完全替代 null
 
 答案：
@@ -177,6 +190,7 @@
 
 **关联知识点：** [Optional 基础](../知识点梳理/Lambda-Stream-Optional.md#optional-基础)
 
+<a id="android-低版本使用-stream-和-optional-要注意什么"></a>
 ###### Android 低版本使用 Stream 和 Optional 要注意什么
 
 答案：

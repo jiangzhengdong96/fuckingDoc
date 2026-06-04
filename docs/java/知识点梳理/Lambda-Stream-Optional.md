@@ -23,6 +23,7 @@
 - [常见坑](#常见坑)
 - [面试可能怎么问](#面试可能怎么问)
 
+<a id="lambda-基础"></a>
 ###### Lambda 基础
 
 - Lambda 表达式可以理解为“把一段行为当作参数传递”。它主要用于替代只有一个抽象方法的接口实现，例如点击监听、排序规则、回调处理。
@@ -63,6 +64,7 @@ list.forEach(item -> System.out.println(prefix + item));
 
 - Lambda 和匿名内部类都能表达回调，但 Lambda 更强调“行为”，匿名内部类更强调“对象”。如果需要定义多个方法、保存复杂状态或重写 `equals()` 等对象行为，匿名内部类仍然更合适。
 
+<a id="函数式接口"></a>
 ###### 函数式接口
 
 - 函数式接口是只包含一个抽象方法的接口，Lambda 最终会被转换成这种接口的实例。
@@ -93,6 +95,7 @@ public interface Mapper<T, R> {
 - 如果项目里自己定义回调接口，并且这个接口只有一个回调方法，可以考虑加 `@FunctionalInterface`，让调用方能用 Lambda 简化代码。
 - 函数式接口的命名要表达清楚语义。不要为了能用 Lambda，把本来包含多个职责的接口强行拆成难懂的小接口。
 
+<a id="方法引用"></a>
 ###### 方法引用
 
 - 方法引用是 Lambda 的简写形式，适合 Lambda 只是简单调用一个已有方法的场景。
@@ -124,6 +127,7 @@ list.stream()
 
 - 方法引用能提升可读性，但前提是读者能一眼看出引用的方法是什么。复杂参数转换、条件判断、多步逻辑不要强行改成方法引用。
 
+<a id="stream-基础"></a>
 ###### Stream 基础
 
 - Stream 是对数据处理流程的抽象，不是集合本身，也不会存储数据。
@@ -151,6 +155,7 @@ long count = stream.count();
 - Stream 管道里的操作应该尽量保持无副作用。不要在 `map`、`filter` 中修改外部集合、更新 UI 或改变共享状态，否则代码会变得难以推理。
 - `parallelStream()` 会把任务拆到多个线程执行，适合数据量大、计算密集、无共享状态的场景。Android 业务代码里通常要慎用，因为线程调度、公共线程池、UI 线程约束和数据量不足都可能让它得不偿失。
 
+<a id="stream-常用操作"></a>
 ###### Stream 常用操作
 
 - `filter`：过滤元素，只保留满足条件的数据。
@@ -205,6 +210,7 @@ int total = numbers.stream()
 - `findAny`：返回任意一个元素，并行流里可能更容易优化。
 - 基本类型流 `IntStream`、`LongStream`、`DoubleStream` 可以减少装箱拆箱开销，适合数值计算。
 
+<a id="optional-基础"></a>
 ###### Optional 基础
 
 - Optional 是一个容器，用来表达“这个值可能存在，也可能不存在”。
@@ -243,6 +249,7 @@ String name = findUser(id)
 - `get()` 在 Optional 为空时会抛 `NoSuchElementException`，一般不建议直接使用。
 - Optional 不是为了完全消灭 null，而是让“可能为空”在 API 上更明确。字段、参数、集合元素里滥用 Optional 往往会增加复杂度。
 
+<a id="android-使用场景和注意点"></a>
 ###### Android 使用场景和注意点
 
 - Lambda 在 Android 中很常见，点击监听、Adapter 事件、回调传递、排序、集合处理都可以使用。
@@ -254,6 +261,7 @@ String name = findUser(id)
 - `parallelStream()` 通常不适合 Android 日常业务代码。它使用公共线程池，线程调度不可控，也不能直接更新 UI。
 - Kotlin 项目里很多场景可以用 Kotlin 的集合操作和空安全替代 Java Stream / Optional，但 Java 代码里仍然需要理解这些 API。
 
+<a id="常见坑"></a>
 ###### 常见坑
 
 - Lambda 捕获的局部变量必须是 final 或 effectively final，不能在 Lambda 内修改外部局部变量。
@@ -270,6 +278,7 @@ String name = findUser(id)
 - `orElse()` 的默认值会提前求值，默认值创建成本高或带副作用时要用 `orElseGet()`。
 - Optional 不适合作为序列化模型字段、数据库实体字段或 Android Intent 参数字段，容易和框架反射、序列化、Parcelable 处理产生额外复杂度。
 
+<a id="面试可能怎么问"></a>
 ###### 面试可能怎么问
 
 - [Lambda 表达式解决了什么问题](../面试/Lambda-Stream-Optional面试题.md#lambda-表达式解决了什么问题)

@@ -12,6 +12,7 @@
 - [字符串拼接什么时候会创建新对象](#字符串拼接什么时候会创建新对象)
 - [intern 有什么作用](#intern-有什么作用)
 
+<a id="string-为什么不可变"></a>
 ###### String 为什么不可变
 
 答案：
@@ -24,6 +25,7 @@
 
 **关联知识点：** [Java String](../知识点梳理/String.md)
 
+<a id="new-string-abc-创建几个对象"></a>
 ###### new String abc 创建几个对象
 
 答案：
@@ -36,6 +38,7 @@
 
 **关联知识点：** [Java String](../知识点梳理/String.md)
 
+<a id="stringbuilder-和-stringbuffer-有什么区别"></a>
 ###### StringBuilder 和 StringBuffer 有什么区别
 
 答案：
@@ -48,6 +51,7 @@
 
 **关联知识点：** [Java String](../知识点梳理/String.md)
 
+<a id="字符串拼接什么时候会创建新对象"></a>
 ###### 字符串拼接什么时候会创建新对象
 
 答案：
@@ -60,6 +64,7 @@
 
 **关联知识点：** [Java String](../知识点梳理/String.md)
 
+<a id="intern-有什么作用"></a>
 ###### intern 有什么作用
 
 答案：

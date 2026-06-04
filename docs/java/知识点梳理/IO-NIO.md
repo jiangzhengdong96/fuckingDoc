@@ -22,6 +22,7 @@
 - [常见问题和易错点](#常见问题和易错点)
 - [面试可能怎么问](#面试可能怎么问)
 
+<a id="io-基础分类"></a>
 ###### IO 基础分类
 
 - 输入流是从数据源读取数据，相当于读。
@@ -36,6 +37,7 @@
 - 节点流直接连接数据源，比如文件、内存数组、管道。
 - 处理流包装其他流，提供缓冲、对象序列化、数据类型读写、打印输出等增强能力。
 
+<a id="常用-io-流"></a>
 ###### 常用 IO 流
 
 | 类型 | 输入流 | 输出流 | 说明 |
@@ -85,6 +87,7 @@ ByteArrayOutputStream output = new ByteArrayOutputStream();
 ByteArrayOutputStream sizedOutput = new ByteArrayOutputStream(1024);
 ```
 
+<a id="缓冲流和资源关闭"></a>
 ###### 缓冲流和资源关闭
 
 - 不带缓冲的流如果频繁单字节读写，会频繁访问底层资源，效率较低。
@@ -120,6 +123,7 @@ BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 String line = reader.readLine();
 ```
 
+<a id="字符编码和转换流"></a>
 ###### 字符编码和转换流
 
 - 文本文件读写要明确字符编码，常见编码有 `UTF-8`、`GBK`、`ISO-8859-1`。
@@ -146,6 +150,7 @@ try (
 }
 ```
 
+<a id="文件-api"></a>
 ###### 文件 API
 
 - `File` 表示文件或目录路径，不代表文件内容本身。
@@ -161,6 +166,7 @@ try (
 - `Files.walk()` 返回流式结果，使用后也需要关闭。
 - `RandomAccessFile` 更偏底层文件读写工具，可以指定 `"r"`、`"rw"` 等模式打开文件，并通过文件指针控制读写位置。
 
+<a id="bio--nio--aio"></a>
 ###### BIO / NIO / AIO
 
 - Android 普通业务开发里很少直接手写 BIO / NIO / AIO 网络模型，更多是使用 `InputStream` / `OutputStream`、`File` / `Files`、`ContentResolver`、OkHttp 等上层 API。
@@ -177,6 +183,7 @@ try (
 - `transferTo()` / `transferFrom()` 可以在通道之间传输数据，和零拷贝概念相关，了解即可。
 - `MappedByteBuffer` 可以把文件映射到内存，适合大文件随机访问，Android 日常业务中不常直接使用。
 
+<a id="常见问题和易错点"></a>
 ###### 常见问题和易错点
 
 - IO 流会占用系统资源，尤其是文件句柄，必须关闭。
@@ -196,6 +203,7 @@ try (
 - `Files.walk()`、`Stream<Path>` 这类返回流的 API 也需要关闭。
 - Android 开发中，如果涉及 assets、raw、外部存储、ContentResolver，要结合 Android 存储模型理解，不要只按普通 Java 文件路径处理。
 
+<a id="面试可能怎么问"></a>
 ###### 面试可能怎么问
 
 - 输入流和输出流有什么区别？

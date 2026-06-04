@@ -41,6 +41,16 @@ Choose the note type from the user's intent:
   - `###### 面试可能怎么问`
 - `使用场景` briefly describes where the knowledge point appears in Android or day-to-day development. Keep it concise and avoid long examples unless the user asks.
 - In `topic` notes, only the user-defined knowledge columns are included in the first-level column navigation. Do not add every small subpoint to the navigation.
+- Every in-page navigation link must have an explicit HTML anchor immediately before the target heading. Do not rely on the Markdown renderer's automatic heading slug, because Chinese headings and symbols such as `/`, `.`, `()`, `?`, and spaces are rendered inconsistently across tools.
+  - Use this form:
+    ```markdown
+    - [知识点1](#知识点1)
+
+    <a id="知识点1"></a>
+    ###### 知识点1
+    ```
+  - For `interview` notes, apply the same rule to every question in `面试题导航`.
+  - For cross-file links with fragments, for example `../面试/集合面试题.md#hashmap-底层结构`, ensure the target file contains `<a id="hashmap-底层结构"></a>` before the target heading.
 - Content under a `topic` column can be bullet points, short paragraphs, tables, images, code blocks, or references.
 - When organizing user-provided raw notes into `topic` notes, preserve the user's original wording as much as possible and only do classification, light bullet formatting, and Markdown cleanup.
 - When updating a `topic` knowledge note, scan for the matching interview note in the same module, for example `docs/java/知识点梳理/集合.md` -> `docs/java/面试/集合面试题.md`. If the topic gained new interview-worthy points, update the topic's `###### 面试可能怎么问` section and the matching interview note in the same task, unless the user explicitly says not to update interview content.

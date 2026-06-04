@@ -8,6 +8,7 @@
 | [Algorithms](./algorithms/) | 记录算法和数据结构知识，覆盖数组、链表、树、图、排序和动态规划。 | 0 |
 | [Android](./android/) | 记录 Android 应用开发基础知识，覆盖系统组件、生命周期、权限、存储、通知和 IPC 等常用能力。 | 0 |
 | [Android Framework](./android-framework/) | 记录 Android Framework 原理，用于理解应用启动、系统服务、消息机制和跨进程通信等底层流程。 | 0 |
+| [Android TV](./android-tv/) | 记录 Android TV 端开发知识，覆盖 TV 应用基础、遥控器交互、焦点系统、大屏 UI 适配、列表性能、媒体播放、调试发布和常见问题排查。这个模块主要服务于 Android TV 项目开发、问题定位和面试复盘。 | 4 |
 | [API Design](./api-design/) | 记录 App 与后端协作中的接口设计知识，覆盖错误码、分页、幂等、兼容性、缓存和版本演进。 | 0 |
 | [Architecture](./architecture/) | 记录架构设计知识，覆盖 MVC、MVP、MVVM、MVI、Clean Architecture 和组件化。 | 0 |
 | [Build System](./build-system/) | 记录构建系统通用知识，覆盖编译、依赖管理、增量构建和构建产物。 | 0 |
