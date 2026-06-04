@@ -14,7 +14,9 @@
 
 - [TV 列表特点](#tv-列表特点)
 - [RecyclerView 基础策略](#recyclerview-基础策略)
+- [Adapter 和 ViewHolder 写法](#adapter-和-viewholder-写法)
 - [横竖嵌套列表](#横竖嵌套列表)
+- [嵌套列表代码结构](#嵌套列表代码结构)
 - [焦点稳定](#焦点稳定)
 - [数据刷新](#数据刷新)
 - [图片加载](#图片加载)
@@ -43,6 +45,113 @@
 - 不要在 `onBindViewHolder()` 中无条件 `requestFocus()`，否则滚动和刷新时会反复抢焦点。
 - 如果需要请求焦点，要先判断是否是目标 item、是否已 attach、是否当前页面允许恢复焦点。
 
+<a id="adapter-和-viewholder-写法"></a>
+###### Adapter 和 ViewHolder 写法
+
+TV 列表推荐优先使用 `ListAdapter + DiffUtil`，让 item 身份稳定，减少刷新时焦点 View 被销毁的概率。
+
+```kotlin
+class ContentAdapter(
+    private val onCardClick: (Content) -> Unit,
+    private val onCardFocus: (Content, Int) -> Unit
+) : ListAdapter<Content, ContentViewHolder>(DIFF) {
+
+    init {
+        setHasStableIds(true)
+    }
+
+    override fun getItemId(position: Int): Long {
+        return getItem(position).id.hashCode().toLong()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_tv_content_card, parent, false)
+        return ContentViewHolder(view, onCardClick, onCardFocus)
+    }
+
+    override fun onBindViewHolder(holder: ContentViewHolder, position: Int) {
+        holder.bind(getItem(position))
+    }
+
+    companion object {
+        private val DIFF = object : DiffUtil.ItemCallback<Content>() {
+            override fun areItemsTheSame(oldItem: Content, newItem: Content): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(oldItem: Content, newItem: Content): Boolean {
+                return oldItem == newItem
+            }
+        }
+    }
+}
+```
+
+ViewHolder 中只绑定当前 item 的显示、点击、焦点态，不在 `bind()` 里无条件恢复焦点：
+
+```kotlin
+class ContentViewHolder(
+    itemView: View,
+    private val onCardClick: (Content) -> Unit,
+    private val onCardFocus: (Content, Int) -> Unit
+) : RecyclerView.ViewHolder(itemView) {
+
+    private val poster = itemView.findViewById<ImageView>(R.id.poster)
+    private val title = itemView.findViewById<TextView>(R.id.title)
+
+    fun bind(item: Content) {
+        title.text = item.title
+        poster.load(item.posterUrl) {
+            crossfade(false)
+            placeholder(R.drawable.bg_poster_placeholder)
+            size(360, 520)
+        }
+
+        itemView.setOnClickListener {
+            onCardClick(item)
+        }
+
+        itemView.setOnFocusChangeListener { view, hasFocus ->
+            view.isSelected = hasFocus
+            view.animate()
+                .scaleX(if (hasFocus) 1.08f else 1f)
+                .scaleY(if (hasFocus) 1.08f else 1f)
+                .setDuration(120L)
+                .start()
+
+            if (hasFocus && bindingAdapterPosition != RecyclerView.NO_POSITION) {
+                onCardFocus(item, bindingAdapterPosition)
+            }
+        }
+    }
+}
+```
+
+item XML 建议固定宽高，并给焦点放大留出外部空间：
+
+```xml
+<FrameLayout
+    android:layout_width="204dp"
+    android:layout_height="292dp"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:padding="12dp">
+
+    <FrameLayout
+        android:id="@+id/cardRoot"
+        android:layout_width="180dp"
+        android:layout_height="260dp"
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/bg_tv_card_selector">
+
+        <!-- poster + title -->
+    </FrameLayout>
+</FrameLayout>
+```
+
 <a id="横竖嵌套列表"></a>
 ###### 横竖嵌套列表
 
@@ -61,6 +170,159 @@
 - 外层行和内层 item 都要有焦点恢复策略。通常保存外层栏目 id、内层内容 id、外层 position、内层 position。
 - 横向列表滚动位置要按栏目保存。否则用户上下切换后，可能每行都回到第一个 item。
 - 嵌套列表要控制 ViewPool、缓存和预取，减少频繁创建 ViewHolder。
+
+<a id="嵌套列表代码结构"></a>
+###### 嵌套列表代码结构
+
+首页常见数据结构：
+
+```kotlin
+data class HomeRow(
+    val id: String,
+    val title: String,
+    val items: List<Content>
+)
+
+data class FocusAnchor(
+    val rowId: String,
+    val contentId: String,
+    val rowPosition: Int,
+    val itemPosition: Int
+)
+```
+
+外层 Adapter 负责行，内层 Adapter 负责卡片。共享 `RecycledViewPool` 可以减少内层 ViewHolder 创建：
+
+```kotlin
+class HomeRowAdapter(
+    private val sharedPool: RecyclerView.RecycledViewPool,
+    private val onCardClick: (Content) -> Unit,
+    private val onCardFocus: (HomeRow, Content, Int, Int) -> Unit
+) : ListAdapter<HomeRow, RowViewHolder>(ROW_DIFF) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RowViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_tv_home_row, parent, false)
+        return RowViewHolder(view, sharedPool, onCardClick, onCardFocus)
+    }
+
+    override fun onBindViewHolder(holder: RowViewHolder, position: Int) {
+        holder.bind(getItem(position), position)
+    }
+}
+```
+
+行 ViewHolder 初始化横向列表：
+
+```kotlin
+class RowViewHolder(
+    itemView: View,
+    sharedPool: RecyclerView.RecycledViewPool,
+    private val onCardClick: (Content) -> Unit,
+    private val onCardFocus: (HomeRow, Content, Int, Int) -> Unit
+) : RecyclerView.ViewHolder(itemView) {
+
+    private val title = itemView.findViewById<TextView>(R.id.rowTitle)
+    private val recyclerView = itemView.findViewById<RecyclerView>(R.id.horizontalList)
+    private val adapter = ContentAdapter(
+        onCardClick = onCardClick,
+        onCardFocus = { content, itemPosition ->
+            val row = currentRow ?: return@ContentAdapter
+            val rowPosition = bindingAdapterPosition
+            if (rowPosition != RecyclerView.NO_POSITION) {
+                onCardFocus(row, content, rowPosition, itemPosition)
+            }
+        }
+    )
+
+    private var currentRow: HomeRow? = null
+
+    init {
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(
+            itemView.context,
+            RecyclerView.HORIZONTAL,
+            false
+        )
+        recyclerView.setRecycledViewPool(sharedPool)
+        recyclerView.itemAnimator = null
+        recyclerView.clipChildren = false
+        recyclerView.clipToPadding = false
+    }
+
+    fun bind(row: HomeRow, rowPosition: Int) {
+        currentRow = row
+        title.text = row.title
+        adapter.submitList(row.items)
+    }
+}
+```
+
+外层 RecyclerView 初始化：
+
+```kotlin
+private val sharedPool = RecyclerView.RecycledViewPool()
+
+private val rowAdapter = HomeRowAdapter(
+    sharedPool = sharedPool,
+    onCardClick = { content -> openDetail(content) },
+    onCardFocus = { row, content, rowPosition, itemPosition ->
+        viewModel.saveFocus(
+            FocusAnchor(
+                rowId = row.id,
+                contentId = content.id,
+                rowPosition = rowPosition,
+                itemPosition = itemPosition
+            )
+        )
+    }
+)
+
+fun setupHomeList() {
+    binding.rowList.adapter = rowAdapter
+    binding.rowList.layoutManager = LinearLayoutManager(requireContext())
+    binding.rowList.itemAnimator = null
+    binding.rowList.clipChildren = false
+    binding.rowList.clipToPadding = false
+}
+```
+
+根据业务 id 恢复嵌套列表焦点：
+
+```kotlin
+fun restoreNestedFocus(anchor: FocusAnchor, rows: List<HomeRow>) {
+    val rowPosition = rows.indexOfFirst { it.id == anchor.rowId }
+        .takeIf { it >= 0 }
+        ?: anchor.rowPosition.coerceIn(rows.indices)
+
+    val row = rows.getOrNull(rowPosition) ?: return
+    val itemPosition = row.items.indexOfFirst { it.id == anchor.contentId }
+        .takeIf { it >= 0 }
+        ?: anchor.itemPosition.coerceIn(row.items.indices)
+
+    binding.rowList.scrollToPosition(rowPosition)
+
+    binding.rowList.post {
+        val rowHolder = binding.rowList
+            .findViewHolderForAdapterPosition(rowPosition) as? RowViewHolder
+
+        rowHolder?.requestChildFocus(itemPosition)
+    }
+}
+```
+
+行 ViewHolder 暴露内层恢复方法：
+
+```kotlin
+fun requestChildFocus(itemPosition: Int) {
+    recyclerView.scrollToPosition(itemPosition)
+    recyclerView.requestFocusWhenChildAttached(itemPosition) { child ->
+        child.findViewById(R.id.cardRoot)
+    }
+}
+```
+
+恢复焦点时要处理数据为空、栏目被删除、内容被下架这些降级场景。上面的代码先按业务 id 找，找不到再按旧 position 降级。
 
 <a id="焦点稳定"></a>
 ###### 焦点稳定
@@ -88,6 +350,38 @@
 - 刷新后恢复焦点的顺序建议是：提交数据、等待列表完成布局、定位目标 item、滚动到可见、请求焦点。
 - 如果刷新后目标 item 不存在，要有降级焦点：同栏目第一个、邻近 item、页面默认按钮。
 - 分页加载时不要让底部 loading item 抢走焦点，除非它本身是可操作入口。
+
+`submitList` 有提交完成回调，可以用于“数据已经进 Adapter 之后”的恢复入口：
+
+```kotlin
+rowAdapter.submitList(rows) {
+    val anchor = viewModel.lastFocusAnchor
+    if (anchor != null) {
+        restoreNestedFocus(anchor, rows)
+    } else {
+        requestDefaultHomeFocus(rows)
+    }
+}
+```
+
+如果接口刷新很频繁，不要每次 `submitList` 都恢复焦点。可以加一个一次性标记：
+
+```kotlin
+private var pendingRestoreFocus = false
+
+fun markNeedRestoreFocus() {
+    pendingRestoreFocus = true
+}
+
+fun renderRows(rows: List<HomeRow>) {
+    rowAdapter.submitList(rows) {
+        if (pendingRestoreFocus) {
+            pendingRestoreFocus = false
+            viewModel.lastFocusAnchor?.let { restoreNestedFocus(it, rows) }
+        }
+    }
+}
+```
 
 <a id="图片加载"></a>
 ###### 图片加载

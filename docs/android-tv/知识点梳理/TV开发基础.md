@@ -16,6 +16,8 @@
 - [TV 和手机端差异](#tv-和手机端差异)
 - [10-foot UI](#10-foot-ui)
 - [输入方式](#输入方式)
+- [常用控件和页面结构](#常用控件和页面结构)
+- [页面跳转和数据下发](#页面跳转和数据下发)
 - [工程和 Manifest](#工程和-manifest)
 - [Leanback 和 Compose for TV](#leanback-和-compose-for-tv)
 - [设备适配](#设备适配)
@@ -69,6 +71,199 @@
 - 确认键一般用于触发当前焦点控件的点击行为。很多设备上 `DPAD_CENTER` 和 `ENTER` 都可能表示确认，需要同时考虑。
 - 返回键要保持可预期。弹窗、播放器控制层、详情页、首页退出等场景要明确返回优先级。
 - 长按、双击、组合键等高级交互要慎用，因为不同遥控器和设备厂商处理不完全一致。
+
+<a id="常用控件和页面结构"></a>
+###### 常用控件和页面结构
+
+TV 端控件选择的核心不是“能不能显示”，而是“能不能被遥控器稳定聚焦和触发”。同一个页面可以继续使用 Android View 体系，但每个可操作控件都要明确焦点态、点击行为和方向路径。
+
+| 控件 / 组件                                   | 常见用途           | 编程重点                                                                    |
+| ----------------------------------------- | -------------- | ----------------------------------------------------------------------- |
+| `TextView`                                | 标题、标签、Tab、按钮文案 | 作为按钮使用时要设置 `focusable`、`clickable` 和焦点背景                                |
+| `Button` / `MaterialButton`               | 确认、取消、重试、登录    | TV 上要有明显焦点态，不要只依赖触摸 ripple                                              |
+| `ImageView`                               | 海报、图标、背景图      | 图片尺寸固定，焦点态通常放在外层容器                                                      |
+| `FrameLayout` / `ConstraintLayout`        | 卡片根布局、浮层容器     | 常作为 item 的可聚焦根节点                                                        |
+| `RecyclerView`                            | 首页、频道页、搜索结果、选集 | item 身份稳定、焦点恢复、滚动到可见                                                    |
+| `HorizontalGridView` / `VerticalGridView` | Leanback 列表    | TV 焦点支持更完整，适合传统 Leanback 项目，相对于recycleview更加焦点支持比如焦点滑动类型，滑动距离，item展示方向等 |
+| `PlayerView`                              | 播放页            | 视频根容器和控制层焦点要分层管理                                                        |
+| `DialogFragment`                          | 确认框、筛选、清晰度面板   | 显示后下发弹窗焦点，关闭后恢复来源焦点                                                     |
+RecyclerView和HorizontalGridView / VerticalGridView的区别：
+**RecyclerView 是“列表控件”，HorizontalGridView / VerticalGridView 是“带 TV 焦点策略的列表控件”。**
+- RecyclerView 默认不懂 TV 焦点体验，默认只是依赖 Android 系统的 FocusFinder 去找下一个可聚焦 View，所以存在问题，系统找最近的view，会导致焦点可能丢失或者跑偏。
+- HorizontalGridView / VerticalGridView 更主动去管理焦点和滚动策略，比如焦点移动后根据position去计算目标适合滚动的目标，算出来后再让目标获取焦点
+- 焦点滚动对其不同，recycleview是只要view显示就直接移动焦点，HorizontalGridView / VerticalGridView会移动焦点并且列表计算滚动距离，并且有不同的焦点滚动策略去处理
+- 嵌套列表焦点表现不同
+- 焦点恢复不同，比如焦点 item 被移出屏幕、数据刷新、页面切换，recycleview焦点需要新增代码维护，HorizontalGridView / VerticalGridView不用
+- 方向目标不可见 recycleview焦点可能跳到外面去，HorizontalGridView / VerticalGridView会等待item可见后再聚焦
+- recycleview适合处理一些比较复杂的列表页面自己去定义焦点走向，HorizontalGridView / VerticalGridView 适合稍微正常普通点的列表
+- android:descendantFocusability属性设置
+	beforeDescendants：父优先
+	afterDescendants：子优先，父兜底
+	blocksDescendants：只要父，不要子
+
+
+一个内容卡片通常让卡片根布局获得焦点，而不是让图片、标题、角标都分别获得焦点：
+
+```xml
+<FrameLayout
+    android:id="@+id/cardRoot"
+    android:layout_width="180dp"
+    android:layout_height="260dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="@drawable/bg_tv_card_focus">
+
+    <ImageView
+        android:id="@+id/poster"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_gravity="bottom"
+        android:gravity="center_vertical"
+        android:singleLine="true" />
+</FrameLayout>
+```
+
+ViewHolder 里绑定焦点态和点击：
+
+```kotlin
+class ContentViewHolder(
+    itemView: View,
+    private val onClick: (Content) -> Unit,
+    private val onFocus: (Content) -> Unit
+) : RecyclerView.ViewHolder(itemView) {
+
+    private val title = itemView.findViewById<TextView>(R.id.title)
+
+    fun bind(item: Content) {
+        title.text = item.title
+
+        itemView.setOnClickListener {
+            onClick(item)
+        }
+
+        itemView.setOnFocusChangeListener { view, hasFocus ->
+            view.animate()
+                .scaleX(if (hasFocus) 1.08f else 1f)
+                .scaleY(if (hasFocus) 1.08f else 1f)
+                .setDuration(120L)
+                .start()
+
+            if (hasFocus) {
+                onFocus(item)
+            }
+        }
+    }
+}
+```
+
+Compose for TV 中也要显式处理焦点和按键。常见写法是给卡片绑定 `focusRequester`、`onFocusChanged` 和 `onKeyEvent`：
+
+```kotlin
+@Composable
+fun TvContentCard(
+    item: Content,
+    modifier: Modifier = Modifier,
+    onClick: (Content) -> Unit
+) {
+    var focused by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = modifier
+            .size(width = 180.dp, height = 260.dp)
+            .focusable()
+            .onFocusChanged { focused = it.isFocused }
+            .onKeyEvent { event ->
+                if (event.type == KeyEventType.KeyUp &&
+                    (event.key == Key.DirectionCenter || event.key == Key.Enter)
+                ) {
+                    onClick(item)
+                    true
+                } else {
+                    false
+                }
+            }
+            .graphicsLayer {
+                scaleX = if (focused) 1.08f else 1f
+                scaleY = if (focused) 1.08f else 1f
+            }
+    ) {
+        // poster + title
+    }
+}
+```
+
+控件设计上可以按下面的粒度拆分：
+
+- 内容卡片：根布局聚焦，确认键进入详情或播放。
+- Tab / 分类：Tab 自己聚焦，确认键切换业务选中态，不要在获得焦点时立即切换。
+- 播放控制按钮：按钮聚焦，确认键触发播放、暂停、快进、清晰度等动作。
+- 错误页：重试按钮默认聚焦，返回按钮作为次要焦点。
+- 空态页：如果只有提示文案，不要让文案聚焦；如果有重试或返回，聚焦可操作按钮。
+
+<a id="页面跳转和数据下发"></a>
+###### 页面跳转和数据下发
+
+TV 页面跳转和手机端一样可以用 Activity、Fragment、Navigation 或 Router，但要额外保存“从哪个焦点进入”和“返回后恢复到哪里”。数据下发建议传稳定业务 id，不建议只传 adapter position。
+
+从列表进入详情时，至少保存内容 id 和所在栏目 id：
+
+```kotlin
+data class TvFocusAnchor(
+    val rowId: String,
+    val contentId: String,
+    val rowPosition: Int,
+    val itemPosition: Int
+)
+
+class HomeViewModel : ViewModel() {
+    var lastFocusAnchor: TvFocusAnchor? = null
+        private set
+
+    fun onCardFocused(row: RowUiModel, item: Content, rowPos: Int, itemPos: Int) {
+        lastFocusAnchor = TvFocusAnchor(
+            rowId = row.id,
+            contentId = item.id,
+            rowPosition = rowPos,
+            itemPosition = itemPos
+        )
+    }
+}
+```
+
+跳转详情时传内容 id，而不是把整个大对象塞进 Intent：
+
+```kotlin
+fun openDetail(context: Context, item: Content) {
+    val intent = Intent(context, DetailActivity::class.java)
+        .putExtra("content_id", item.id)
+    context.startActivity(intent)
+}
+```
+
+Fragment Navigation 可以用 arguments 或 Safe Args，原则一样：传稳定 id，详情页自己拉取或从共享仓库读取详情数据。
+
+```kotlin
+findNavController().navigate(
+    R.id.action_home_to_detail,
+    bundleOf("content_id" to item.id)
+)
+```
+
+返回列表页时的恢复顺序：
+
+1. 恢复页面数据。
+2. 用 `rowId/contentId` 找到新的 position。
+3. 先滚动外层行，再滚动内层列表。
+4. 等目标 item attach 或布局完成。
+5. 调用 `requestFocus()`。
+
+不要在 `onResume()` 里无条件恢复焦点。只有从详情、弹窗、登录页等明确场景返回时才恢复，否则用户在当前页移动焦点会被抢回去。
 
 <a id="工程和-manifest"></a>
 ###### 工程和 Manifest
