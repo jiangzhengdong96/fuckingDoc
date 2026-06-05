@@ -87,6 +87,7 @@ TV 端控件选择的核心不是“能不能显示”，而是“能不能被�
 | `HorizontalGridView` / `VerticalGridView` | Leanback 列表    | TV 焦点支持更完整，适合传统 Leanback 项目，相对于recycleview更加焦点支持比如焦点滑动类型，滑动距离，item展示方向等 |
 | `PlayerView`                              | 播放页            | 视频根容器和控制层焦点要分层管理                                                        |
 | `DialogFragment`                          | 确认框、筛选、清晰度面板   | 显示后下发弹窗焦点，关闭后恢复来源焦点                                                     |
+
 RecyclerView和HorizontalGridView / VerticalGridView的区别：
 **RecyclerView 是“列表控件”，HorizontalGridView / VerticalGridView 是“带 TV 焦点策略的列表控件”。**
 - RecyclerView 默认不懂 TV 焦点体验，默认只是依赖 Android 系统的 FocusFinder 去找下一个可聚焦 View，所以存在问题，系统找最近的view，会导致焦点可能丢失或者跑偏。
