@@ -7,6 +7,25 @@ description: Use this skill whenever the user wants to create, organize, update,
 
 This project skill maintains the Android technical knowledge repository.
 
+## Relationship to Project Rules
+
+Use this skill as the task workflow for note maintenance. The project-level
+rules live in `AGENT.md`, and the detailed repository writing rules live in
+`docs/knowledge-rules.md`.
+
+In practice:
+
+- `AGENT.md` defines the repository-wide expectations and boundaries.
+- `docs/knowledge-rules.md` defines the durable note structure and writing rules.
+- This skill defines how to execute note-related tasks step by step.
+
+Delegate narrow tasks to the more specific project skills when they fit:
+
+- Use `interview-note-manage` for interview-question generation, interview note
+  structure, and topic-to-interview synchronization.
+- Use `knowledge-check` for link checks, anchor checks, README navigation checks,
+  duplicate scans, and repository verification.
+
 ## First Steps
 
 1. Work from the repository root.
