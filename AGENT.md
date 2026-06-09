@@ -32,6 +32,18 @@ and source-reading summaries.
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\<script-name>.ps1
 ```
 
+## Hooks
+
+- Project-local Codex hooks live in `.codex/hooks.json`.
+- Hook scripts live under `.codex/hooks/`.
+- The current `Stop` hook runs `.codex/hooks/knowledge-stop-check.ps1`.
+- The hook only acts when knowledge-repository files changed, such as `docs/`,
+  `templates/`, `AGENT.md`, `CONTRIBUTING.md`, or `.agents/skills/`.
+- When triggered, it runs `scripts/update-index.ps1` and
+  `scripts/check-knowledge.ps1`, then reports the result back to Codex.
+- If Codex asks to review or trust project hooks, inspect them with `/hooks`
+  before enabling them.
+
 ## Skill Routing
 
 - For creating, organizing, updating, indexing, checking, or generating Markdown

@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/knowledge-rules.md",
+                "file": "docs/ai/README.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "knowledge-rules"
+              "title": "README"
             }
           }
         ],
@@ -200,9 +200,9 @@
   },
   "active": "deaa66fd0bd53571",
   "lastOpenFiles": [
+    "docs/knowledge-rules.md",
     "docs/glossary.md",
     "docs/index.md",
-    "docs/knowledge-rules.md",
     "docs/roadmap.md",
     "templates/interview-template.md",
     "assets/README.md",
