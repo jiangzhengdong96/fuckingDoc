@@ -1,10 +1,10 @@
-### 全局索引
+﻿### 全局索引
 
 这里按模块汇总技术目录。新增、移动或删除笔记后，运行 `scripts/update-index.ps1` 自动刷新本文件。
 
 | 模块 | 说明 | 已整理 |
 |---|---|---:|
-| [AI](./ai/) | 记录 AI、LLM、Prompt 和 AI 编程工具相关知识，用于沉淀 AI 辅助开发、知识整理和 Android AI 场景实践。 | 0 |
+| [AI](./ai/) | 记录 AI、LLM、Prompt、Agent 和 AI 编程工具相关知识，用于沉淀 AI 辅助开发、知识整理和 Android AI 场景实践。 | 4 |
 | [Algorithms](./algorithms/) | 记录算法和数据结构知识，覆盖数组、链表、树、图、排序和动态规划。 | 0 |
 | [Android](./android/) | 记录 Android 应用开发基础知识，覆盖系统组件、生命周期、权限、存储、通知和 IPC 等常用能力。 | 0 |
 | [Android Framework](./android-framework/) | 记录 Android Framework 原理，用于理解应用启动、系统服务、消息机制和跨进程通信等底层流程。 | 0 |
