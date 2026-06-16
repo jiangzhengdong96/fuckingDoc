@@ -18,7 +18,7 @@
 | [Computer Network](./computer-network/) | 记录计算机网络基础知识，覆盖 TCP/IP、HTTP、HTTPS、DNS、TLS 和 WebSocket。 | 0 |
 | [Computer Science](./computer-science/) | 记录计算机基础知识，覆盖操作系统、网络、数据结构和编译原理。 | 0 |
 | [Concurrency](./concurrency/) | 记录并发编程知识，覆盖线程、锁、线程池、CAS、volatile、synchronized 和并发容器。 | 0 |
-| [Coroutine](./coroutine/) | 记录 Kotlin 协程专题知识，用于整理协程基础、作用域、调度器、异常处理、Flow 和 Android 实战。 | 0 |
+| [Coroutine](./coroutine/) | 记录 Kotlin 协程专题知识，用于整理协程基础、作用域、调度器、异常处理、Flow 和 Android 实战。当前先补 Android 协程使用方式和面试题，后续再继续拆分通用协程、Flow 和源码阅读。 | 3 |
 | [Database](./database/) | 记录本地数据存储知识，覆盖 SQLite、Room、DataStore、SharedPreferences 和数据迁移。 | 0 |
 | [Debugging](./debugging/) | 记录调试方法论和调试工具技巧。这里偏通用排查能力，具体问题复盘放到 `troubleshooting/`。 | 0 |
 | [Dependency Management](./dependency-management/) | 记录依赖治理、版本冲突、BOM、升级策略和依赖风险控制。这里偏工程治理，`gradle/` 更偏 Gradle 语法和构建配置。 | 0 |
