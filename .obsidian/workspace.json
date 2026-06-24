@@ -13,30 +13,15 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/android-tv/面试/焦点和遥控器面试题.md",
+                "file": "docs/android-tv/知识点梳理/TV焦点下发源码流程.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "焦点和遥控器面试题"
-            }
-          },
-          {
-            "id": "deaa66fd0bd53571",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "docs/api-design/README.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "README"
+              "title": "TV焦点下发源码流程"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -93,7 +78,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "8dc9194a009e8c5e",
@@ -198,36 +184,37 @@
       "bases:新建数据库": false
     }
   },
-  "active": "deaa66fd0bd53571",
+  "active": "8d9a58a415d74d2a",
   "lastOpenFiles": [
+    "docs/android-tv/面试/焦点和遥控器面试题.md",
+    "docs/android-tv/知识点梳理/TV焦点下发源码流程.md",
+    "docs/android-tv/知识点梳理/焦点和遥控器.md",
     "docs/android-tv/知识点梳理/TV列表和焦点性能.md",
+    "docs/android-tv/知识点梳理/TV发布和调试.md",
     "docs/android-tv/知识点梳理/TV媒体播放.md",
+    "docs/android-tv/知识点梳理/TV开发基础.md",
+    "docs/android-tv/知识点梳理/TV界面适配.md",
+    "docs/android-tv/知识点梳理/README.md",
+    "docs/android-tv/问题集/Android-TV问题集.md",
+    "docs/android-tv/面试/TV界面适配面试题.md",
+    "docs/android-tv/面试/TV项目架构面试题.md",
+    "docs/android-tv/面试/TV性能优化面试题.md",
+    "docs/android-tv/面试/README.md",
+    "docs/android-tv/面试/TV媒体播放面试题.md",
+    "docs/api-design/README.md",
+    "未命名.base",
+    "2026-06-24.md",
     "docs/android-tv/android-tv总结.md",
     "docs/android-tv/README.md",
     "docs/android-tv/面试/TV开发基础面试题.md",
-    "docs/android-tv/知识点梳理/TV发布和调试.md",
-    "docs/android-tv/面试/TV媒体播放面试题.md",
-    "docs/android-tv/知识点梳理/README.md",
-    "docs/android-tv/面试/焦点和遥控器面试题.md",
-    "docs/android-tv/面试/TV界面适配面试题.md",
-    "docs/android-tv/知识点梳理/TV界面适配.md",
-    "docs/android-tv/知识点梳理/TV开发基础.md",
-    "docs/android-tv/知识点梳理/焦点和遥控器.md",
     "docs/coroutine/知识点梳理/Android协程.md",
     "docs/coroutine/知识点梳理/Android协程工程规范.md",
     "docs/coroutine/知识点梳理/协程和传统方案对比.md",
     "docs/coroutine/coroutine总结.md",
     "docs/ai/知识点梳理/Codex学习.md",
     "docs/ai/问题集/Codex问题集.md",
-    "docs/ai/面试/Codex面试题.md",
-    "docs/ai/问题集/README.md",
-    "docs/ai/面试/README.md",
-    "docs/ai/知识点梳理/README.md",
-    "docs/ai/AI总结.md",
     "docs/ai/问题集",
     "docs/ai/面试",
-    "docs/ai/知识点梳理",
-    "docs/ai/README.md",
-    "docs/ai/codex-learning.md"
+    "docs/ai/知识点梳理"
   ]
 }
