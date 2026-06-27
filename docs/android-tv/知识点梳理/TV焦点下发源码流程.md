@@ -349,14 +349,16 @@ class TvHomeRowLayout @JvmOverloads constructor(
   -> 系统进入默认焦点导航
   -> 尝试 View.focusSearch(FOCUS_RIGHT)
   -> 当前 View 通常委托给 parent.focusSearch()
-  -> 根容器或父容器调用 FocusFinder.findNextFocus()
-  -> 先尝试 nextFocusRight 指定的目标
-  -> FocusFinder 收集候选 View
-  -> 按方向和几何位置选出 best candidate
+  -> 根容器或父容器调用 FocusFinder.findNextFocus(root, focused, FOCUS_RIGHT)
+  -> FocusFinder 先尝试 findNextUserSpecifiedFocus()
+  -> focused.findUserSetNextFocus(root, FOCUS_RIGHT) 读取 nextFocusRight
+  -> nextFocusRight 目标可用则直接返回
+  -> 不可用才 root.addFocusables() 收集候选 View
+  -> 再按方向和几何位置选出 best candidate
   -> 对候选 View 调用 requestFocus()
 ```
 
-`nextFocusLeft`、`nextFocusRight`、`nextFocusUp`、`nextFocusDown` 会影响这一流程。它们适合稳定布局，系统在默认几何查找前会优先尝试开发者指定的目标：
+`nextFocusLeft`、`nextFocusRight`、`nextFocusUp`、`nextFocusDown` 会影响这一流程。它们适合稳定布局，系统在 `FocusFinder.findNextFocus()` 里会先走用户指定焦点分支，目标可用就直接返回，目标不可用才进入候选收集和几何查找：
 
 ```xml
 <TextView
@@ -483,15 +485,16 @@ cardView.setOnKeyListener { _, keyCode, event ->
 <a id="focusfinder-几何查找"></a>
 ###### FocusFinder 几何查找
 
-`FocusFinder` 是默认方向焦点搜索的核心。它不是按 View 树顺序简单找下一个，而是先尝试开发者配置的 `nextFocus*` 显式目标；没有可用显式目标时，再根据当前焦点矩形、候选 View 矩形和方向计算“哪个候选最合适”。
+`FocusFinder` 是默认方向焦点搜索的核心。它不是按 View 树顺序简单找下一个，而是先尝试开发者配置的 `nextFocus*` 显式目标；没有可用显式目标时，再收集候选 View，并根据当前焦点矩形、候选 View 矩形和方向计算“哪个候选最合适”。
 
 整体思路：
 
 ```text
 当前焦点 View
   -> 拿到当前 View 在根容器里的 Rect
-  -> 检查 focused view 是否配置了当前方向的 nextFocus*
-  -> nextFocus* 目标可用则优先返回
+  -> findNextUserSpecifiedFocus(root, focused, direction)
+  -> focused.findUserSetNextFocus(root, direction) 检查 nextFocus*
+  -> nextFocus* 目标可见、可聚焦、在 root 内则优先返回
   -> root.addFocusables() 收集候选
   -> 过滤不在目标方向上的候选
   -> 比较候选是否在 beam 范围内
@@ -657,13 +660,14 @@ flowchart TD
     E -- "true" --> F["流程结束: 不进入 nextFocus 和默认焦点搜索"]
     E -- "false" --> G["系统进入默认焦点导航"]
     G --> H["focusSearch(direction)"]
-    H --> I{"是否有可用 nextFocus* 目标"}
-    I -- "有" --> J["目标 View.requestFocus()"]
-    I -- "无或不可用" --> K["FocusFinder.addFocusables() + 几何查找"]
-    K --> J
-    J --> L["旧焦点 onFocusChanged(false)"]
-    J --> M["新焦点 onFocusChanged(true)"]
-    M --> N["父链 requestChildFocus() 记录焦点路径"]
+    H --> I["FocusFinder.findNextFocus(root, focused, direction)"]
+    I --> J{"findNextUserSpecifiedFocus 是否找到可用 nextFocus*"}
+    J -- "有" --> K["目标 View.requestFocus()"]
+    J -- "无或不可用" --> L["addFocusables() 收集候选 + 几何查找"]
+    L --> K
+    K --> M["旧焦点 onFocusChanged(false)"]
+    K --> N["新焦点 onFocusChanged(true)"]
+    N --> O["父链 requestChildFocus() 记录焦点路径"]
 ```
 
 对应到方法职责：
@@ -673,9 +677,9 @@ flowchart TD
 | `dispatchKeyEvent()` | 最开始 | 按键分发，不应该无条件吞方向键 |
 | `OnKeyListener` | 当前焦点 View 收到按键后 | 比默认 `focusSearch()` 更早，返回 true 会拦截焦点移动 |
 | `focusSearch()` | 已有焦点后 | 找下一个可能目标 |
-| `nextFocusLeft / Right / Up / Down` | `focusSearch()` 内部默认搜索前段 | 指定当前方向的显式目标，优先于几何查找 |
-| `FocusFinder.findNextFocus()` | 默认搜索核心 | 根据候选和矩形做选择 |
-| `addFocusables()` | 搜索前置 | 收集候选集合 |
+| `FocusFinder.findNextFocus()` | 默认搜索核心 | 先尝试用户指定的 `nextFocus*`，再按候选和矩形做几何选择 |
+| `nextFocusLeft / Right / Up / Down` | `findNextUserSpecifiedFocus()` / `findUserSetNextFocus()` 阶段 | 指定当前方向的显式目标，优先于候选收集和几何查找 |
+| `addFocusables()` | 几何查找前置 | 没有可用 `nextFocus*` 时收集候选集合 |
 | `requestFocus()` | 找到目标后 | 让目标尝试真正获得焦点 |
 | `onFocusChanged()` | 焦点变化时 | 更新 UI 焦点态 |
 | `requestChildFocus()` | 子焦点成功后 | 父容器记录当前焦点路径 |
