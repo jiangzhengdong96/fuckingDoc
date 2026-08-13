@@ -41,19 +41,20 @@
 - [TV 工程实践规范](#tv-工程实践规范)
 - [调试方法](#调试方法)
 - [面试可能怎么问](#面试可能怎么问)
+- [父容器更新焦点记录的作用](#父容器更新焦点记录的作用)
 
 <a id="源码角色总览"></a>
 ###### 源码角色总览
 
-| 角色 | 主要职责 | TV 场景里的关注点 |
-|---|---|---|
-| `View` | 判断自己是否可聚焦，并真正成为 focused view | item 根布局、按钮、Tab、播放器控制按钮是否满足可聚焦条件 |
-| `ViewGroup` | 管理子 View，决定焦点是否下发到 descendants | 页面根布局、行容器、弹窗容器、控制层容器的焦点优先级 |
-| `FocusFinder` | 根据方向和候选 View 的矩形位置选出下一个焦点 | 为什么按右键没有去“看起来最近”的卡片 |
-| `addFocusables()` | 收集当前范围内可成为候选焦点的 View | 某个 View 没进入候选集，后面就不可能被选中 |
-| `requestChildFocus()` | 子 View 拿到焦点后，通知父容器记录焦点路径 | 自定义容器保存最后焦点、恢复行内焦点 |
-| `RecyclerView` | 动态创建、复用、回收 item，并参与焦点搜索 | item 不一定存在，焦点恢复要等数据和 attach |
-| `RecyclerView.LayoutManager` | 决定 item 布局、滚动和部分焦点搜索行为 | TV 列表按方向键时是否滚动、是否能找到屏幕外 item |
+| 角色                           | 主要职责                           | TV 场景里的关注点                       |
+| ---------------------------- | ------------------------------ | -------------------------------- |
+| `View`                       | 判断自己是否可聚焦，并真正成为 focused view   | item 根布局、按钮、Tab、播放器控制按钮是否满足可聚焦条件 |
+| `ViewGroup`                  | 管理子 View，决定焦点是否下发到 descendants | 页面根布局、行容器、弹窗容器、控制层容器的焦点优先级       |
+| `FocusFinder`                | 根据方向和候选 View 的矩形位置选出下一个焦点      | 为什么按右键没有去“看起来最近”的卡片              |
+| `addFocusables()`            | 收集当前范围内可成为候选焦点的 View           | 某个 View 没进入候选集，后面就不可能被选中         |
+| `requestChildFocus()`        | 子 View 拿到焦点后，通知父容器记录焦点路径       | 自定义容器保存最后焦点、恢复行内焦点               |
+| `RecyclerView`               | 动态创建、复用、回收 item，并参与焦点搜索        | item 不一定存在，焦点恢复要等数据和 attach      |
+| `RecyclerView.LayoutManager` | 决定 item 布局、滚动和部分焦点搜索行为         | TV 列表按方向键时是否滚动、是否能找到屏幕外 item     |
 
 可以先把焦点系统理解成两条主线：
 
@@ -69,21 +70,63 @@
 
 常见入口可以分成四类：
 
-| 入口 | 谁触发 | 典型代码或事件 | 后续会走到哪里 |
-|---|---|---|---|
-| 页面首次默认焦点 | 业务代码 | `target.post { target.requestFocus() }` | `View.requestFocus()` / `ViewGroup.requestFocus()` |
-| 返回页或刷新后恢复焦点 | 业务代码 | `submitList { restoreFocusById() }` | 找到目标 View 后调用 `requestFocus()` |
-| 遥控器方向键移动 | 系统按键分发 | `DPAD_LEFT/RIGHT/UP/DOWN` 没被消费 | `focusSearch()` -> `nextFocus*` / `FocusFinder` -> `requestFocus()` |
-| 窗口获得焦点或系统兜底 | ViewRoot / DecorView / 根布局 | 页面 attach、Window focus 变化、当前焦点失效 | 根 View 或某个 `ViewGroup` 尝试找默认可聚焦目标 |
+| 入口          | 谁触发                        | 典型代码或事件                                 | 后续会走到哪里                                                             |
+| ----------- | -------------------------- | --------------------------------------- | ------------------------------------------------------------------- |
+| 页面首次默认焦点    | 业务代码                       | `target.post { target.requestFocus() }` | `View.requestFocus()` / `ViewGroup.requestFocus()`                  |
+| 返回页或刷新后恢复焦点 | 业务代码                       | `submitList { restoreFocusById() }`     | 找到目标 View 后调用 `requestFocus()`                                      |
+| 遥控器方向键移动    | 系统按键分发                     | `DPAD_LEFT/RIGHT/UP/DOWN` 没被消费          | `focusSearch()` -> `nextFocus*` / `FocusFinder` -> `requestFocus()` |
+| 窗口获得焦点或系统兜底 | ViewRoot / DecorView / 根布局 | 页面 attach、Window focus 变化、当前焦点失效        | 根 View 或某个 `ViewGroup` 尝试找默认可聚焦目标                                   |
 
 Activity 首次进入时，焦点来源要拆成“窗口焦点”和“View 焦点”两层：
 
-- Activity 被启动后，`ActivityThread` 调用 Activity 生命周期。
-- `setContentView()` 把页面布局安装到 `PhoneWindow` 的 `DecorView` 下面。
-- Activity resume 后，Window 被加入 `WindowManager`，系统为这棵 View 树创建 `ViewRootImpl`。
-- `ViewRootImpl` 负责和窗口系统交互，并驱动 measure / layout / draw / input。
-- 当 Window 获得焦点、View 树 attach 且第一次 traversals 过程中，DecorView / 根 View 才会尝试让 View 树里出现一个当前 focused view。
+- Activity 被启动后，`ActivityThread` 调用 `onCreate()` / `onStart()` / `onResume()` 等生命周期。
+- `setContentView()` 只是把页面布局安装到 `PhoneWindow` 的 `DecorView` 下面，此时不等于 Window 已经获得输入焦点，也不等于某个业务 View 已经获得焦点。
+- Activity resume 后，`ActivityThread.handleResumeActivity()` 会让 Activity 变成 visible，`WindowManager.addView(decorView, layoutParams)` 把 `DecorView` 加到窗口系统。
+- `WindowManager.addView()` 内部会创建并绑定 `ViewRootImpl`，`ViewRootImpl.setView()` 持有这棵 View 树，并开始调度 traversals，也就是后续的 attach / measure / layout / draw / input。
+- 系统窗口管理侧会在当前 Activity Window 可见、可接收输入、没有被其他可聚焦 Window 覆盖时，把它选为 focused window。这个时机通常在 Activity resume、DecorView 加入 WindowManager、ViewRootImpl 建立连接之后，而不是 `setContentView()` 时。
+- focused window 变化会回到 app 进程的 `ViewRootImpl`，再向下分发 `dispatchWindowFocusChanged(true)`，最后可以观察到 `Activity.onWindowFocusChanged(true)`。
+- 注意：Window focus 不是 View focus。Window focus 只表示这个 Activity 的窗口成为输入目标，并不是从 Window 开始一路调用 `requestFocus()` 下发到子 View。
+- View 树 attach、首次 traversals / 焦点恢复逻辑具备条件后，DecorView / 根 View 才会尝试让 View 树里出现一个当前 focused view。
 - 这个初始 View 焦点可能来自 XML 默认可聚焦控件、根布局的默认搜索、`ViewGroup` 的 `descendantFocusability` / `onRequestFocusInDescendants()`，也可能被业务后续的 `requestFocus()` 覆盖。
+
+更具体地看，首次进入页面不是一条严格串行的“Window 获取焦点后再逐层下发到 child”的链路，而是两条相关但职责不同的链路。
+
+窗口焦点链路负责决定“哪个 Window 收输入”：
+
+```text
+Activity.onCreate()
+  -> setContentView()，布局进入 PhoneWindow / DecorView
+  -> Activity.onResume()
+  -> ActivityThread 让 Activity 可见
+  -> WindowManager.addView(DecorView)
+  -> ViewRootImpl.setView(DecorView)
+  -> DecorView attach 到 ViewRootImpl，开始首次 traversals
+  -> 系统窗口管理选择当前 Activity Window 作为 focused window
+  -> ViewRootImpl 收到 window focus changed = true
+  -> DecorView.dispatchWindowFocusChanged(true)
+  -> Activity.onWindowFocusChanged(true)
+```
+
+View 焦点链路负责决定“这个 Window 里面哪个 View 收方向键”：
+
+```text
+DecorView / 根 View 已 attach
+  -> ViewRootImpl 调度首次 performTraversals()
+  -> View 树完成或准备完成 measure / layout / draw
+  -> 如果当前还没有具体 focused View（window.decorView.findFocus()去找，有就是弹框或者二级页面返回没有重新绘制，没有就是首次或者二级页面返回重新绘制了）
+  -> 根 View / DecorView 尝试 restoreDefaultFocus()
+  -> ViewGroup.requestFocus()
+  -> onRequestFocusInDescendants()
+  -> child.requestFocus()
+  -> child 成功后父链 requestChildFocus()
+  -> 某个具体 View 成为 window.decorView.findFocus()
+```
+
+所以这里要注意三个边界：
+
+- `Activity.onWindowFocusChanged(true)` 表示这个 Activity 的 Window 成为输入焦点窗口，可以接收按键；它不保证业务上想要的卡片、按钮、Tab 已经拿到 View 焦点。
+- `dispatchWindowFocusChanged(true)` 是窗口焦点变化通知，不是选择子 View 的方法；真正选择具体 View 的是 `restoreDefaultFocus()` / `requestFocus()` / `onRequestFocusInDescendants()` 这一套。
+- 真正能被遥控器操作的还是 `window.decorView.findFocus()` 返回的具体 View。如果这个 View 不是业务预期目标，TV 页面仍然要在数据和布局 ready 后主动 `requestFocus()`。
 
 所以“Activity 获取的焦点是哪来的”要区分：
 
@@ -230,11 +273,11 @@ fun View?.requestFocusIfReady(): Boolean {
 
 这个决策主要受 `descendantFocusability` 影响：
 
-| 策略 | 含义 | 适用场景 | 风险 |
-|---|---|---|---|
-| `beforeDescendants` | 父容器先尝试自己拿焦点，失败后再尝试子 View | 父容器本身就是一个可操作整体 | 子 View 可能不容易优先拿到焦点 |
-| `afterDescendants` | 子 View 优先，子 View 都失败后父容器兜底 | 页面区域、列表行容器、普通内容容器 | 只能改变优先级，不能恢复已丢失焦点 |
-| `blocksDescendants` | 父容器阻止子 View 获取焦点 | loading、遮罩、纯展示区域、禁用区域 | 误用会导致内部按钮和 item 完全无法聚焦 |
+| 策略                  | 含义                         | 适用场景                  | 风险                     |
+| ------------------- | -------------------------- | --------------------- | ---------------------- |
+| `beforeDescendants` | 父容器先尝试自己拿焦点，失败后再尝试子 View   | 父容器本身就是一个可操作整体        | 子 View 可能不容易优先拿到焦点     |
+| `afterDescendants`  | 子 View 优先，子 View 都失败后父容器兜底 | 页面区域、列表行容器、普通内容容器     | 只能改变优先级，不能恢复已丢失焦点      |
+| `blocksDescendants` | 父容器阻止子 View 获取焦点           | loading、遮罩、纯展示区域、禁用区域 | 误用会导致内部按钮和 item 完全无法聚焦 |
 
 简化流程：
 
@@ -271,11 +314,11 @@ android:descendantFocusability="afterDescendants"
 
 `onRequestFocusInDescendants()` 是 `ViewGroup` 的扩展点，含义是：当焦点要进入这个容器时，容器尝试让内部某个子 View 获得焦点。
 
-它通常出现在这些场景：
+它通常出现在这些场景（回调的前提条件`descendantFocusability` 不是 `blockDescendants` ）：
 
 - 页面根容器或某个区域被调用 `requestFocus()`。
 - `ViewGroup` 的 `descendantFocusability` 是 `afterDescendants` 或父容器尝试把焦点下发给 child。
-- 页面返回后，一个区域重新获得焦点机会。
+- 页面返回后（是页面被销毁的情况，没有销毁说明之前有记录的Focused view 直接聚焦即可），一个区域重新获得焦点机会。
 - 弹窗、控制层、侧边栏显示后，希望焦点落到内部默认按钮。
 
 默认逻辑可以理解为遍历子 View：
@@ -349,7 +392,8 @@ class TvHomeRowLayout @JvmOverloads constructor(
   -> 系统进入默认焦点导航
   -> 尝试 View.focusSearch(FOCUS_RIGHT)
   -> 当前 View 通常委托给 parent.focusSearch()
-  -> 根容器或父容器调用 FocusFinder.findNextFocus(root, focused, FOCUS_RIGHT)
+  -> 父链向上找到最近的 root namespace
+  -> root namespace 调用 FocusFinder.findNextFocus(root, focused, FOCUS_RIGHT)
   -> FocusFinder 先尝试 findNextUserSpecifiedFocus()
   -> focused.findUserSetNextFocus(root, FOCUS_RIGHT) 读取 nextFocusRight
   -> nextFocusRight 目标可用则直接返回
@@ -357,6 +401,99 @@ class TvHomeRowLayout @JvmOverloads constructor(
   -> 再按方向和几何位置选出 best candidate
   -> 对候选 View 调用 requestFocus()
 ```
+
+这里的 `root namespace` 可以先按当前 Window 的 `DecorView` 理解。普通 Activity 里，`PhoneWindow` 会把 `DecorView` 标记成 root namespace，所以默认焦点搜索通常会从当前 focused View 一路向父链委托，最后到 `DecorView` 这一层调用 `FocusFinder.findNextFocus()`。它不是 `Activity`，也不是 `ViewRootImpl`。如果某个中间 `ViewGroup` 被显式设置成 root namespace，搜索会提前停在那个容器。
+
+看一个具体结构：
+
+```text
+ViewGroupA
+  ├─ ViewGroupB
+  │   └─ ViewA   当前 focused
+  ├─ ViewGroupC
+  │   └─ ViewB
+  └─ ViewC       默认几何规则最终目标
+```
+
+假设现在焦点在 `ViewA`，用户按 `DPAD_RIGHT`，没有 `OnKeyListener`、`onKeyDown()`、`Activity.dispatchKeyEvent()`、自定义 `focusSearch()` 消费事件，也没有可用的 `nextFocusRight`，最后几何规则选中 `ViewC`，完整流程可以拆开看。
+
+按键先沿当前焦点路径分发：
+
+```text
+1. KeyEvent 进入当前 Activity Window
+2. Activity.dispatchKeyEvent(event)
+3. Window / DecorView 分发到当前焦点路径
+4. ViewGroupA.dispatchKeyEvent(event)
+5. ViewGroupB.dispatchKeyEvent(event)
+6. ViewA.dispatchKeyEvent(event)
+7. ViewA 没有消费 DPAD_RIGHT
+8. ViewRootImpl / 当前 Window 进入默认焦点导航
+9. 当前焦点 = decorView.findFocus() = ViewA
+10. 调用 ViewA.focusSearch(FOCUS_RIGHT)
+```
+
+然后进入 `focusSearch()` 的父链委托：
+
+```text
+ViewA.focusSearch(FOCUS_RIGHT)
+  -> ViewA 自己通常不找下一个焦点
+  -> 委托给 parent，也就是 ViewGroupB.focusSearch(ViewA, FOCUS_RIGHT)
+  -> ViewGroupB 如果不是 root namespace，继续委托给 ViewGroupA
+  -> ViewGroupA 如果也不是 root namespace，继续向上委托给 DecorView
+  -> 最近的 root namespace 调用 FocusFinder.findNextFocus(root, ViewA, FOCUS_RIGHT)
+```
+
+这里重点是：不是 `ViewGroupB` 先问 `ViewGroupC`，再问 `ViewC`。默认几何搜索通常是先找到一个搜索根 `root`，再一次性收集这个 `root` 范围内的候选 View。
+
+接着进入 `FocusFinder` 内部：
+
+```text
+FocusFinder.findNextFocus(root, focused = ViewA, FOCUS_RIGHT)
+  -> 先检查 ViewA 的 nextFocusRight
+  -> 没有配置，或者目标不可见 / 不可聚焦 / 不在 root 内
+  -> root.addFocusables(focusables, FOCUS_RIGHT)
+  -> 收集候选：
+       ViewB
+       ViewC
+       可能还有 ViewGroupB / ViewGroupC / ViewGroupA
+       具体取决于它们是否 focusable、visible、enabled、descendantFocusability
+  -> 排除当前 focused ViewA
+  -> 根据 ViewA 的矩形和 FOCUS_RIGHT 方向做几何比较
+  -> 如果 ViewC 是 best candidate
+  -> 返回 ViewC
+```
+
+然后才是真正让目标拿焦点：
+
+```text
+ViewRootImpl / 默认焦点导航
+  -> next = ViewC
+  -> ViewC.requestFocus(FOCUS_RIGHT, focusedRect)
+  -> 检查 ViewC 是否 attached / shown / enabled / focusable
+  -> 检查祖先没有 FOCUS_BLOCK_DESCENDANTS
+  -> ViewA 失去焦点
+  -> ViewC 获得焦点
+  -> 父链 requestChildFocus()
+```
+
+父链记录会变成：
+
+```text
+ViewC.requestFocus() 成功
+  -> ViewGroupA.requestChildFocus(ViewC, ViewC)
+  -> DecorView / 上层 root 继续 requestChildFocus(ViewGroupA, ViewC)
+```
+
+同时旧路径会被清掉：
+
+```text
+ViewGroupB 原来记录 focused child = ViewA
+ViewA 失焦后，ViewGroupB 不再是当前焦点路径的一部分
+ViewGroupA 当前 focused child 变成 ViewC
+window.decorView.findFocus() 变成 ViewC
+```
+
+这说明方向键默认焦点移动不是“从 `ViewA` 一层层下发到 `ViewGroupC` 再找 `ViewC`”，而是“从当前 focused View 向上找到搜索根，再由 `FocusFinder` 在这个 root 范围内收集候选并按几何规则选中目标”。`nextFocusRight`、`addFocusables()`、`descendantFocusability`、`focusable`、`visibility`、`enabled` 都会影响 `ViewC` 是否能成为最终目标。
 
 `nextFocusLeft`、`nextFocusRight`、`nextFocusUp`、`nextFocusDown` 会影响这一流程。它们适合稳定布局，系统在 `FocusFinder.findNextFocus()` 里会先走用户指定焦点分支，目标可用就直接返回，目标不可用才进入候选收集和几何查找：
 
@@ -1099,3 +1236,50 @@ RecyclerView 重点日志：
 - [RecyclerView 刷新后应该如何恢复 TV 焦点](../面试/焦点和遥控器面试题.md#recyclerview-刷新后应该如何恢复-tv-焦点)
 - [Activity ViewPager 多 Fragment 怎么做焦点管理](../面试/焦点和遥控器面试题.md#activity-viewpager-多-fragment-怎么做焦点管理)
 - [打开新页面再返回时焦点怎么恢复](../面试/焦点和遥控器面试题.md#打开新页面再返回时焦点怎么恢复)
+
+<a id="父容器更新焦点记录的作用"></a>
+###### 父容器更新焦点记录的作用
+
+先给结论：子 View 成功获得焦点后，父容器更新焦点记录，是为了让整棵 View 树知道“当前焦点落在哪一条子树路径里”。它不是再次发起焦点请求，而是把已经成功的焦点结果同步到父链。
+
+可以把它理解成一条从根节点到真正 focused View 的路径：
+
+```text
+DecorView
+  -> RootLayout
+    -> RecyclerView
+      -> itemView
+        -> cardRoot  真正 focused
+```
+
+当 `cardRoot.requestFocus()` 成功后，父链会逐级记录：
+
+```text
+cardRoot 成功获得焦点
+  -> itemView.requestChildFocus(cardRoot, cardRoot)
+  -> RecyclerView.requestChildFocus(itemView, cardRoot)
+  -> RootLayout.requestChildFocus(RecyclerView, cardRoot)
+  -> DecorView.requestChildFocus(RootLayout, cardRoot)
+```
+
+这里每一层的 `child` 都是“当前父容器的直接子 View”，`focused` 才是最终真正拿到焦点的那个 View。父容器记录的是“焦点在我的哪个直接 child 分支里”，多层连起来就是完整焦点路径。
+
+它主要有几个作用：
+
+- 让 `decorView.findFocus()`、`ViewGroup.findFocus()` 能沿着已记录的 focused child 一层层找到真正焦点，而不是每次全树扫描。
+- 让父容器的 `hasFocus()` 能反映“我的子树里有焦点”，即父容器自己不一定 `isFocused=true`，但它知道内部 child 正在持有焦点。
+- 让后续按键分发能从正确路径继续下发。按键进入 `DecorView` / 根 View 后，`ViewGroup.dispatchKeyEvent()` 可以根据当前 focused child 把事件交给真正焦点 View。
+- 让下一次方向搜索有准确起点。`focusSearch()` 不是从页面第一个控件重新开始，而是从当前 focused View 出发找下一个候选。
+- 让容器可以维护自己的焦点状态，例如某一行最后聚焦哪个卡片、某个 Tab 区最后选中哪个 child、弹窗关闭后要恢复哪个区域。
+- 让 `RecyclerView` / `LayoutManager` 有机会感知 child 获得焦点，并结合滚动、item 可见性、布局状态做处理。
+
+所以 `requestChildFocus()` 的价值不只是“记录一下当前焦点是谁”，而是让整棵 View 树形成一个可追踪的焦点路径。没有这条路径，系统后续就很难可靠地完成 `findFocus()`、`hasFocus()`、按键继续分发、方向搜索和局部焦点恢复。
+
+和 `onRequestFocusInDescendants()` 的关系也可以这样区分：
+
+| 方法 | 发生时机 | 作用 |
+|---|---|---|
+| `onRequestFocusInDescendants()` | 焦点准备进入一个 `ViewGroup` 时 | 容器决定把焦点优先交给哪个 child |
+| `requestChildFocus()` | 某个 child 已经成功拿到焦点后 | 父容器记录焦点在自己的哪个 child 分支里 |
+
+也就是：`onRequestFocusInDescendants()` 偏“进入时选择谁”，`requestChildFocus()` 偏“选中后记录路径”。它们可以配合做焦点记忆，但不是一前一后必然成对调用；方向键搜索直接找到目标并 `requestFocus()` 成功时，也会触发父链的 `requestChildFocus()` 记录。
