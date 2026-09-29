@@ -7,15 +7,21 @@
 面试题导航：
 
 - [协程和线程有什么区别](#协程和线程有什么区别)
+- [协程核心对象之间是什么关系](#协程核心对象之间是什么关系)
+- [CoroutineContext 里常见配置项有哪些](#coroutinecontext-里常见配置项有哪些)
+- [suspend 函数底层为什么能挂起恢复](#suspend-函数底层为什么能挂起恢复)
 - [Android 中为什么推荐使用 viewModelScope](#android-中为什么推荐使用-viewmodelscope)
 - [viewModelScope 和 lifecycleScope 有什么区别](#viewmodelscope-和-lifecyclescope-有什么区别)
+- [Android 中各种级别作用域怎么选](#android-中各种级别作用域怎么选)
 - [为什么不建议使用 GlobalScope](#为什么不建议使用-globalscope)
 - [launch async withContext 有什么区别](#launch-async-withcontext-有什么区别)
+- [launch 的 context start block 参数分别是什么](#launch-的-context-start-block-参数分别是什么)
 - [Dispatchers Main IO Default 怎么选择](#dispatchers-main-io-default-怎么选择)
 - [Fragment 收集 Flow 为什么推荐 repeatOnLifecycle](#fragment-收集-flow-为什么推荐-repeatonlifecycle)
 - [什么是结构化并发](#什么是结构化并发)
 - [协程取消为什么是协作式的](#协程取消为什么是协作式的)
 - [launch 和 async 的异常传播有什么区别](#launch-和-async-的异常传播有什么区别)
+- [Job SupervisorJob CoroutineExceptionHandler 怎么配合](#job-supervisorjob-coroutineexceptionhandler-怎么配合)
 - [为什么捕获异常时要注意 CancellationException](#为什么捕获异常时要注意-cancellationexception)
 - [StateFlow 和 SharedFlow 有什么区别](#stateflow-和-sharedflow-有什么区别)
 - [Android 协程常见使用方式是什么](#android-协程常见使用方式是什么)
@@ -37,6 +43,45 @@
 
 **关联知识点：** [Android 协程 - 协程解决什么问题](../知识点梳理/Android协程.md#协程解决什么问题)
 
+<a id="协程核心对象之间是什么关系"></a>
+###### 协程核心对象之间是什么关系
+
+答案：
+
+**简答：** `CoroutineScope` 是启动协程的归属入口，`CoroutineContext` 是协程配置集合，`Job` 管生命周期和父子关系，`CoroutineDispatcher` 决定线程调度，`Continuation` 保存挂起后的恢复点。
+
+**展开回答：** 可以按这条链路理解：`CoroutineScope` 持有 `CoroutineContext`，context 里通常放 `Job`、`Dispatcher`、`CoroutineName`、`CoroutineExceptionHandler` 等元素；`launch` 或 `async` 基于 scope 创建协程；协程执行到 suspend 挂起点时，通过 `Continuation` 保存后续执行位置；结果回来后由 Dispatcher 把 continuation 恢复到合适线程继续执行。源码阅读时会看到 `StandaloneCoroutine`、`DeferredCoroutine`、`DispatchedContinuation`、`ContinuationImpl` 等实现名，但业务代码不应该依赖这些内部类。
+
+**易错点：** 不要把协程等同于线程，也不要把 `CoroutineScope` 理解成线程池；真正管理生命周期的是 `Job`，真正决定执行线程的是 `Dispatcher`。
+
+**关联知识点：** [协程核心对象和底层实现 - 核心对象关系](../知识点梳理/协程核心对象和底层实现.md#核心对象关系)
+
+<a id="coroutinecontext-里常见配置项有哪些"></a>
+###### CoroutineContext 里常见配置项有哪些
+
+答案：
+
+**简答：** 常见配置项包括 `Job` / `SupervisorJob`、`CoroutineDispatcher`、`CoroutineName`、`CoroutineExceptionHandler`，特殊清理场景还会用 `NonCancellable`。
+
+**展开回答：** `CoroutineContext` 可以通过 `+` 组合多个元素，例如 `SupervisorJob() + Dispatchers.IO + CoroutineName("sync")`。`Job` 决定任务生命周期和取消传播，`Dispatcher` 决定运行线程，`CoroutineName` 方便调试，`CoroutineExceptionHandler` 处理未捕获异常。相同 key 的元素后者会覆盖前者，所以在 `viewModelScope.launch(Job())` 里随便传新的 `Job` 可能改变父子关系，导致任务脱离原本的结构化并发链路。
+
+**易错点：** `CoroutineExceptionHandler` 不是业务错误处理的替代品；接口失败、表单失败这类业务错误仍然应该在 ViewModel 或调用链中转成 UI 状态。
+
+**关联知识点：** [协程核心对象和底层实现 - CoroutineContext 配置项](../知识点梳理/协程核心对象和底层实现.md#coroutinecontext-配置项)
+
+<a id="suspend-函数底层为什么能挂起恢复"></a>
+###### suspend 函数底层为什么能挂起恢复
+
+答案：
+
+**简答：** suspend 函数会被编译成带 `Continuation` 的状态机，挂起时保存当前执行位置和局部状态，结果回来后再从对应状态继续执行。
+
+**展开回答：** suspend 不是自动开线程。它的核心是把“后续代码”包装成 continuation。执行到挂起点时，如果结果还没准备好，就返回挂起标记，当前线程可以去做别的事；异步结果回来后，通过 continuation 恢复，状态机根据 label 跳回挂起后的下一段代码。`delay()` 这类挂起函数不会像 `Thread.sleep()` 一样占住线程。
+
+**易错点：** suspend 函数不等于后台函数。如果函数内部做文件读写、数据库阻塞查询或 CPU 密集计算，仍然要配合 `withContext(Dispatchers.IO)` 或 `Dispatchers.Default`。
+
+**关联知识点：** [协程核心对象和底层实现 - 挂起函数和状态机](../知识点梳理/协程核心对象和底层实现.md#挂起函数和状态机)
+
 <a id="android-中为什么推荐使用-viewmodelscope"></a>
 ###### Android 中为什么推荐使用 viewModelScope
 
@@ -49,6 +94,19 @@
 **易错点：** `viewModelScope` 适合页面状态相关任务，不适合需要跨页面长期运行的全局任务。
 
 **关联知识点：** [Android 协程 - Android 常用作用域](../知识点梳理/Android协程.md#android-常用作用域)
+
+<a id="android-中各种级别作用域怎么选"></a>
+###### Android 中各种级别作用域怎么选
+
+答案：
+
+**简答：** 作用域选择看任务 owner：页面状态用 `viewModelScope`，更新 Fragment View 用 `viewLifecycleOwner.lifecycleScope`，生命周期短任务用 `lifecycleScope`，Compose 副作用用 `LaunchedEffect`，局部并发用 `coroutineScope` / `supervisorScope`，跨页面长期任务用明确 owner 的外部 scope。
+
+**展开回答：** 协程作用域不是随便找个地方 launch，而是要回答“任务属于谁，什么时候取消”。例如页面数据加载属于 ViewModel，所以用 `viewModelScope`；Fragment View 销毁后不能再更新 binding，所以收集 UI 状态用 `viewLifecycleOwner.lifecycleScope`；多个接口并发组合并等待结果可以用 `coroutineScope`；多个区域互不影响可以用 `supervisorScope`。真正跨页面的同步任务可以由 Application 或 Manager 持有 `SupervisorJob + Dispatcher` 的外部 scope，并提供取消入口。
+
+**易错点：** Repository 默认不应该因为拿不到 scope 就创建 `GlobalScope`；多数 Repository 暴露 `suspend` 或 `Flow`，由调用方决定生命周期。
+
+**关联知识点：** [协程核心对象和底层实现 - 作用域级别](../知识点梳理/协程核心对象和底层实现.md#作用域级别)
 
 <a id="viewmodelscope-和-lifecyclescope-有什么区别"></a>
 ###### viewModelScope 和 lifecycleScope 有什么区别
@@ -88,6 +146,19 @@
 **易错点：** 不要用 `async` 但不 `await()`，这会让结果和异常都难以管理。
 
 **关联知识点：** [Android 协程 - 调度器和线程切换](../知识点梳理/Android协程.md#调度器和线程切换)
+
+<a id="launch-的-context-start-block-参数分别是什么"></a>
+###### launch 的 context start block 参数分别是什么
+
+答案：
+
+**简答：** `context` 用来追加或覆盖本次协程的上下文配置，`start` 控制启动时机，`block` 是真正执行的协程体；`launch` 返回 `Job`。
+
+**展开回答：** `launch(context = EmptyCoroutineContext, start = CoroutineStart.DEFAULT, block)` 会把当前 scope 的 context 和传入 context 合并，再创建一个子协程。常见 context 是 `Dispatchers.IO`、`CoroutineName`、`CoroutineExceptionHandler`；`start` 默认是 `DEFAULT`，`LAZY` 表示调用 `start()` / `join()` 时才启动，`ATOMIC` 和 `UNDISPATCHED` 偏底层场景，Android 业务很少用。`block` 里面再启动的子协程默认属于这个父协程。
+
+**易错点：** 不要在 `viewModelScope.launch(Job())` 里随便传新的 `Job`，这可能改变父子取消关系；一般只传 Dispatcher、Name 或 Handler。
+
+**关联知识点：** [协程核心对象和底层实现 - 启动方法参数](../知识点梳理/协程核心对象和底层实现.md#启动方法参数)
 
 <a id="dispatchers-main-io-default-怎么选择"></a>
 ###### Dispatchers Main IO Default 怎么选择
@@ -153,6 +224,19 @@
 **易错点：** 以为 `CoroutineExceptionHandler` 能捕获所有 `async` 异常，这是不准确的；`async` 异常通常要通过 `await()` 处理。
 
 **关联知识点：** [Android 协程 - 异常处理](../知识点梳理/Android协程.md#异常处理)
+
+<a id="job-supervisorjob-coroutineexceptionhandler-怎么配合"></a>
+###### Job SupervisorJob CoroutineExceptionHandler 怎么配合
+
+答案：
+
+**简答：** `Job` 负责父子生命周期和取消传播，`SupervisorJob` 改变子任务失败对兄弟任务的影响，`CoroutineExceptionHandler` 只兜底未捕获异常，三者解决的问题不同。
+
+**展开回答：** 普通 `Job` 下，一个子协程未捕获异常通常会取消父协程并影响兄弟任务；`SupervisorJob` 或 `supervisorScope` 下，一个子任务失败不会自动取消其它子任务，适合多个独立区域加载。但监督不代表异常消失，失败子任务仍然要 `try/catch`、`await()` 处理或让 root handler 记录。`CoroutineExceptionHandler` 更像最后兜底日志入口，不能替代业务错误态建模。
+
+**易错点：** 以为加了 `SupervisorJob` 就不用处理异常是错的；它只是隔离失败传播，不负责把错误转成 UI 状态。
+
+**关联知识点：** [协程核心对象和底层实现 - Job 取消和异常传播](../知识点梳理/协程核心对象和底层实现.md#job-取消和异常传播)
 
 <a id="为什么捕获异常时要注意-cancellationexception"></a>
 ###### 为什么捕获异常时要注意 CancellationException

@@ -314,7 +314,7 @@ android:descendantFocusability="afterDescendants"
 
 `onRequestFocusInDescendants()` 是 `ViewGroup` 的扩展点，含义是：当焦点要进入这个容器时，容器尝试让内部某个子 View 获得焦点。
 
-它通常出现在这些场景（回调的前提条件`descendantFocusability` 不是 `blockDescendants` ）：
+它通常出现在这些场景（**回调的前提条件`descendantFocusability` 不是 `blockDescendants`** ）：
 
 - 页面根容器或某个区域被调用 `requestFocus()`。
 - `ViewGroup` 的 `descendantFocusability` 是 `afterDescendants` 或父容器尝试把焦点下发给 child。
@@ -379,10 +379,10 @@ class TvHomeRowLayout @JvmOverloads constructor(
 
 和 `requestFocus()` 的区别：
 
-| 方法 | 问题 | 返回结果 | 典型触发 |
-|---|---|---|---|
-| `requestFocus()` | 这个 View 能不能成为当前焦点 | 是否成功拿到焦点 | 页面默认焦点、恢复焦点、搜索到目标后 |
-| `focusSearch()` | 从当前焦点按方向能找到谁 | 下一个候选 View | 用户按方向键 |
+| 方法               | 问题                | 返回结果       | 典型触发               |
+| ---------------- | ----------------- | ---------- | ------------------ |
+| `requestFocus()` | 这个 View 能不能成为当前焦点 | 是否成功拿到焦点   | 页面默认焦点、恢复焦点、搜索到目标后 |
+| `focusSearch()`  | 从当前焦点按方向能找到谁      | 下一个候选 View | 用户按方向键             |
 
 如果先不考虑按键拦截，方向键移动的简化流程是：
 
@@ -561,15 +561,15 @@ override fun focusSearch(focused: View, direction: Int): View? {
 
 关键顺序：
 
-| 阶段 | 发生时机 | 返回 true 的影响 |
-|---|---|---|
-| `Activity.dispatchKeyEvent()` | 每次方向键进入当前 Activity Window 时都会先到这里 | 返回 true 时整个 View 树都收不到这个按键；调用 `super` 或返回 false 才继续分发 |
-| `ViewGroup.dispatchKeyEvent()` | 事件沿 View 树分发时 | 子 View 和默认焦点导航都可能收不到 |
-| `View.OnKeyListener` | 当前 focused View 的 `dispatchKeyEvent()` 内部，早于默认 `onKeyDown()` | 当前 View 消费该按键，后续 `nextFocus` 和默认 `FocusFinder` 不执行 |
-| `View.onKeyDown()` / `onKeyUp()` | `OnKeyListener` 未消费后 | 返回 true 也会阻止后续默认处理 |
-| `focusSearch()` | 按键没人消费后，系统进入焦点导航 | 返回自定义目标会影响后续选择 |
-| `nextFocus*` | `focusSearch()` / `FocusFinder` 查找目标时 | 可用目标优先于几何查找 |
-| `FocusFinder` 几何查找 | 没有可用 `nextFocus*` 目标时 | 从候选集中按方向和矩形位置选择目标 |
+| 阶段                               | 发生时机                                                         | 返回 true 的影响                                           |
+| -------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------- |
+| `Activity.dispatchKeyEvent()`    | 每次方向键进入当前 Activity Window 时都会先到这里                            | 返回 true 时整个 View 树都收不到这个按键；调用 `super` 或返回 false 才继续分发 |
+| `ViewGroup.dispatchKeyEvent()`   | 事件沿 View 树分发时                                                | 子 View 和默认焦点导航都可能收不到                                  |
+| `View.OnKeyListener`             | 当前 focused View 的 `dispatchKeyEvent()` 内部，早于默认 `onKeyDown()` | 当前 View 消费该按键，后续 `nextFocus` 和默认 `FocusFinder` 不执行    |
+| `View.onKeyDown()` / `onKeyUp()` | `OnKeyListener` 未消费后                                         | 返回 true 也会阻止后续默认处理                                    |
+| `focusSearch()`                  | 按键没人消费后，系统进入焦点导航                                             | 返回自定义目标会影响后续选择                                        |
+| `nextFocus*`                     | `focusSearch()` / `FocusFinder` 查找目标时                        | 可用目标优先于几何查找                                           |
+| `FocusFinder` 几何查找               | 没有可用 `nextFocus*` 目标时                                        | 从候选集中按方向和矩形位置选择目标                                     |
 
 `OnKeyListener` 拦截示例：
 
@@ -837,11 +837,11 @@ RecyclerView 是 TV 焦点问题最多的地方，因为它不是静态 View 树
 
 先区分三个概念：
 
-| 方法 | 含义 | 是否代表 View 进入窗口 |
-|---|---|---|
-| `onBindViewHolder()` | 把数据绑定到 ViewHolder | 不代表 attach，可能只是复用后重新绑定 |
-| `onViewAttachedToWindow()` | item View 进入 RecyclerView 可见或缓存窗口 | 代表这个 item View attach 到 RecyclerView |
-| `onViewDetachedFromWindow()` | item View 离开 RecyclerView 可见或缓存窗口 | 焦点在这个 View 上时要特别小心 |
+| 方法                           | 含义                                | 是否代表 View 进入窗口                       |
+| ---------------------------- | --------------------------------- | ------------------------------------ |
+| `onBindViewHolder()`         | 把数据绑定到 ViewHolder                 | 不代表 attach，可能只是复用后重新绑定               |
+| `onViewAttachedToWindow()`   | item View 进入 RecyclerView 可见或缓存窗口 | 代表这个 item View attach 到 RecyclerView |
+| `onViewDetachedFromWindow()` | item View 离开 RecyclerView 可见或缓存窗口 | 焦点在这个 View 上时要特别小心                   |
 
 刷新导致焦点丢失的典型链路：
 
@@ -994,14 +994,14 @@ class HomeFragment : Fragment(), TvKeyHandler {
 
 如果只是某个区域内部的焦点移动，不需要 Activity 拦截后再下发给 Fragment。更推荐让对应 View 树自己处理：
 
-| 场景 | 推荐处理位置 |
-|---|---|
-| 固定按钮左右上下跳转 | XML / 代码里的 `nextFocusLeft/Right/Up/Down` |
+| 场景                | 推荐处理位置                                        |
+| ----------------- | --------------------------------------------- |
+| 固定按钮左右上下跳转        | XML / 代码里的 `nextFocusLeft/Right/Up/Down`      |
 | 容器进入时默认聚焦内部 child | 自定义 `ViewGroup.onRequestFocusInDescendants()` |
-| 局部方向路径定制 | 自定义 `ViewGroup.focusSearch()` |
-| 限制候选焦点范围 | 自定义 `ViewGroup.addFocusables()` |
-| 列表 item 焦点移动和滚动 | `RecyclerView` / `LayoutManager` / item View |
-| 页面级菜单键、播放器全局键 | Activity 转发给当前 Fragment 或全局控制器 |
+| 局部方向路径定制          | 自定义 `ViewGroup.focusSearch()`                 |
+| 限制候选焦点范围          | 自定义 `ViewGroup.addFocusables()`               |
+| 列表 item 焦点移动和滚动   | `RecyclerView` / `LayoutManager` / item View  |
+| 页面级菜单键、播放器全局键     | Activity 转发给当前 Fragment 或全局控制器                |
 
 ViewPager 多 Fragment 常见焦点管理方式：
 

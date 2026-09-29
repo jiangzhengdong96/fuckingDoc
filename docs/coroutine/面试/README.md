@@ -12,10 +12,10 @@
 
 - 先能讲清协程、线程、挂起函数和调度器的关系。
 - 再能讲清 Android 中作用域、生命周期、Flow 收集和异常处理。
-- 最后能结合 ViewModel、Repository、Fragment 说明实际使用方式。
+- 最后能结合 ViewModel、Repository、Fragment 说明实际使用方式，并能追问到 `CoroutineContext`、`Job`、`Continuation` 和状态机。
 
 ###### 待整理
 
 - [ ] launch / async / withContext 面试题
 - [ ] Flow 面试题
-- [ ] 协程异常处理面试题
+- [ ] 协程源码阅读面试题

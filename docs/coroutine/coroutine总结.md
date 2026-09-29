@@ -25,6 +25,7 @@ docs/coroutine/
 | 文件 | 内容 |
 |---|---|
 | [Android协程.md](./知识点梳理/Android协程.md) | Android 中协程的使用方式、作用域、调度器、生命周期收集、异常处理和常见坑 |
+| [协程核心对象和底层实现.md](./知识点梳理/协程核心对象和底层实现.md) | 协程核心对象关系、CoroutineContext 配置项、启动参数、作用域级别、Continuation 状态机和 Job 异常取消链路 |
 | [协程和传统方案对比.md](./知识点梳理/协程和传统方案对比.md) | 协程和 Thread、Handler、Executor、RxJava、LiveData 等传统异步方案的对比 |
 | [Android协程工程规范.md](./知识点梳理/Android协程工程规范.md) | Android 项目中协程分层、作用域、Dispatcher 注入、状态建模、错误处理和测试规范 |
 
@@ -42,6 +43,7 @@ docs/coroutine/
 |---|---|---|
 | 入门 | 理解协程解决什么问题，以及在 Android 中放在哪些层使用 | [Android协程.md](./知识点梳理/Android协程.md) |
 | 使用 | 掌握 viewModelScope、lifecycleScope、withContext、repeatOnLifecycle 的写法 | [Android协程.md](./知识点梳理/Android协程.md#android-常用使用方式) |
+| 原理 | 建立 CoroutineScope、CoroutineContext、Job、Dispatcher、Continuation 和状态机的关系 | [协程核心对象和底层实现.md](./知识点梳理/协程核心对象和底层实现.md) |
 | 对比 | 理解协程相对 Thread、Handler、Executor、RxJava、LiveData 的取舍 | [协程和传统方案对比.md](./知识点梳理/协程和传统方案对比.md) |
 | 工程 | 建立 Android 项目里的协程分层和验证规范 | [Android协程工程规范.md](./知识点梳理/Android协程工程规范.md) |
 | 进阶 | 理解结构化并发、取消、异常传播和 Flow 生命周期收集 | [Android协程面试题.md](./面试/Android协程面试题.md) |
@@ -50,6 +52,5 @@ docs/coroutine/
 ###### 后续待补充
 
 - launch、async、withContext 的独立知识点。
-- Job、SupervisorJob、CoroutineExceptionHandler 的异常专题。
 - Flow、StateFlow、SharedFlow 和 Channel 的对比。
 - 协程源码阅读和调度器原理。

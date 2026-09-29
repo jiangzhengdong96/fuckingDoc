@@ -1,7 +1,9 @@
 
+### Android 协程
+
 ###### 内容概述
 
-本文件记录 Android 中使用 Kotlin 协程的核心知识，包括协程定位、常用依赖、作用域选择、启动方式、调度器切换、生命周期收集、异常处理、取消机制、常见使用方式和易错点。
+本文件记录 Android 中使用 Kotlin 协程的核心知识，包括协程定位、常用依赖、作用域选择、启动方式、调度器切换、生命周期收集、异常处理、取消机制、常见使用方式和易错点。更底层的对象模型、方法参数、状态机和源码实现线索详见 [协程核心对象和底层实现](./协程核心对象和底层实现.md)。
 
 ###### 使用场景
 
@@ -30,6 +32,7 @@
 - 协程不是线程。协程运行在线程之上，由调度器决定具体在哪个线程执行。
 - 在 Android 中，协程常用来处理网络请求、数据库读写、复杂业务组合和 UI 状态更新。
 - 协程的核心价值是：可取消、可组合、能切线程、能跟生命周期绑定。
+- 如果需要从源码角度理解，重点看 `CoroutineScope`、`CoroutineContext`、`Job`、`CoroutineDispatcher`、`Continuation` 的关系，参考 [协程核心对象和底层实现 - 核心对象关系](./协程核心对象和底层实现.md#核心对象关系)。
 
 示例：
 
@@ -46,6 +49,7 @@ viewModelScope.launch {
 
 - 协程和线程有什么区别？
 - Android 为什么推荐用协程处理异步任务？
+- 协程底层有哪些核心对象？
 
 <a id="android-常用依赖"></a>
 ###### Android 常用依赖
@@ -106,11 +110,12 @@ class UserViewModel(
     fun loadUser(userId: String) {
         viewModelScope.launch {
             _uiState.value = UserUiState.Loading
-            runCatching {
-                repository.getUser(userId)
-            }.onSuccess { user ->
+            try {
+                val user = repository.getUser(userId)
                 _uiState.value = UserUiState.Success(user)
-            }.onFailure { error ->
+            } catch (e: CancellationException) {
+                throw e
+            } catch (error: Exception) {
                 _uiState.value = UserUiState.Error(error.message ?: "加载失败")
             }
         }
@@ -163,6 +168,7 @@ binding.retryButton.setOnClickListener {
 ###### 面试可能怎么问
 
 - Android 中协程从 ViewModel 到 Repository 一般怎么分层使用？
+- Android 协程的作用域级别应该怎么选？
 
 <a id="调度器和线程切换"></a>
 ###### 调度器和线程切换
@@ -197,6 +203,7 @@ viewModelScope.launch {
 
 - `Dispatchers.IO` 和 `Dispatchers.Default` 有什么区别？
 - `withContext` 和 `launch` 有什么区别？
+- `launch` 的 `context`、`start`、`block` 参数分别是什么？
 
 <a id="生命周期感知收集-flow"></a>
 ###### 生命周期感知收集 Flow
@@ -314,6 +321,8 @@ viewModelScope.launch {
         val userDeferred = async { repository.loadUser() }
         val orderDeferred = async { repository.loadOrders() }
         render(userDeferred.await(), orderDeferred.await())
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         showError(e)
     }
