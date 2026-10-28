@@ -1,27 +1,44 @@
 ### Android 协程工程规范
 
+<!-- page-toc:start -->
+**目录**
+
+- [内容概述](#section-内容概述)
+- [使用场景](#section-使用场景)
+- [分层职责](#分层职责)
+- [分层职责：面试可能怎么问](#section-面试可能怎么问)
+- [作用域选择](#作用域选择)
+- [作用域选择：面试可能怎么问](#section-面试可能怎么问-2)
+- [Dispatcher 注入](#dispatcher-注入)
+- [Dispatcher 注入：面试可能怎么问](#section-面试可能怎么问-3)
+- [Repository 暴露 suspend 还是 Flow](#repository-暴露-suspend-还是-flow)
+- [Repository 暴露 suspend 还是 Flow：面试可能怎么问](#section-面试可能怎么问-4)
+- [UI 状态建模](#ui-状态建模)
+- [UI 状态建模：面试可能怎么问](#section-面试可能怎么问-5)
+- [事件处理](#事件处理)
+- [事件处理：面试可能怎么问](#section-面试可能怎么问-6)
+- [错误处理](#错误处理)
+- [错误处理：面试可能怎么问](#section-面试可能怎么问-7)
+- [生命周期收集](#生命周期收集)
+- [生命周期收集：面试可能怎么问](#section-面试可能怎么问-8)
+- [测试规范](#测试规范)
+- [测试规范：面试可能怎么问](#section-面试可能怎么问-9)
+- [Code Review 清单](#code-review-清单)
+- [Code Review 清单：面试可能怎么问](#section-面试可能怎么问-10)
+<!-- page-toc:end -->
+
+
+<a id="section-内容概述"></a>
 ###### 内容概述
 
 本文件记录 Android 项目中使用协程的工程规范，包括分层职责、作用域选择、Dispatcher 注入、UI 状态建模、错误处理、Flow 暴露、生命周期收集、测试和代码审查要点。
 
+<a id="section-使用场景"></a>
 ###### 使用场景
 
 - 新项目制定协程使用规范。
 - 老项目从回调、RxJava、Handler 或 Executor 迁移到协程。
 - Code Review 时检查协程代码是否符合 Android 分层和生命周期要求。
-
-一级栏目导航：
-
-- [分层职责](#分层职责)
-- [作用域选择](#作用域选择)
-- [Dispatcher 注入](#dispatcher-注入)
-- [Repository 暴露 suspend 还是 Flow](#repository-暴露-suspend-还是-flow)
-- [UI 状态建模](#ui-状态建模)
-- [事件处理](#事件处理)
-- [错误处理](#错误处理)
-- [生命周期收集](#生命周期收集)
-- [测试规范](#测试规范)
-- [Code Review 清单](#code-review-清单)
 
 <a id="分层职责"></a>
 ###### 分层职责
@@ -50,6 +67,7 @@ UI(Activity/Fragment/Compose)
 - 在 Repository 中直接引用 View 或 Activity。
 - 在 DataSource 里更新 UI 状态。
 
+<a id="section-面试可能怎么问"></a>
 ###### 面试可能怎么问
 
 - Android 项目里协程应该放在哪一层使用？
@@ -94,6 +112,7 @@ GlobalScope.launch {
 - 页面销毁后不会自动取消。
 - 异常和结果回调难以追踪。
 
+<a id="section-面试可能怎么问-2"></a>
 ###### 面试可能怎么问
 
 - Repository 里能不能直接创建 CoroutineScope？
@@ -136,6 +155,7 @@ class UserRepository(
 - 线程策略集中管理。
 - 更容易看出某段代码应该运行在哪类线程。
 
+<a id="section-面试可能怎么问-3"></a>
 ###### 面试可能怎么问
 
 - 为什么建议注入 Dispatcher，而不是到处写 Dispatchers.IO？
@@ -166,6 +186,7 @@ interface UserRepository {
 - Repository 负责领域数据，不负责 UI loading、Toast、导航。
 - ViewModel 把 Repository 结果转换成 UI State。
 
+<a id="section-面试可能怎么问-4"></a>
 ###### 面试可能怎么问
 
 - Repository 方法什么时候返回 suspend，什么时候返回 Flow？
@@ -209,6 +230,7 @@ var user: User? = null
 - 状态组合容易互相矛盾，例如同时 loading 和 error。
 - 多个字段更新不是原子语义，UI 容易短暂看到中间态。
 
+<a id="section-面试可能怎么问-5"></a>
 ###### 面试可能怎么问
 
 - 为什么 ViewModel 常用 StateFlow 表示 UI 状态？
@@ -248,6 +270,7 @@ private suspend fun sendLoginSuccess() {
 - 根据业务决定 `replay` 是否为 0。
 - 页面重建后不应该重复执行的事件，不要做成粘性状态。
 
+<a id="section-面试可能怎么问-6"></a>
 ###### 面试可能怎么问
 
 - Toast 和导航事件为什么不建议直接放进 StateFlow？
@@ -278,6 +301,7 @@ viewModelScope.launch {
 - ViewModel 决定页面错误态和重试入口。
 - 全局兜底日志可以有，但不能替代业务错误处理。
 
+<a id="section-面试可能怎么问-7"></a>
 ###### 面试可能怎么问
 
 - 协程异常应该在哪一层转成 UI 错误态？
@@ -304,6 +328,7 @@ viewLifecycleOwner.lifecycleScope.launch {
 - Flow 收集和页面可见性有关时，优先用 `repeatOnLifecycle`。
 - Compose 中根据副作用类型选择 `LaunchedEffect`、`rememberCoroutineScope`、`collectAsStateWithLifecycle`。
 
+<a id="section-面试可能怎么问-8"></a>
 ###### 面试可能怎么问
 
 - Fragment 中收集 StateFlow 为什么要绑定 viewLifecycleOwner？
@@ -328,6 +353,8 @@ fun loadUser_success_updatesContentState() = runTest {
 
     viewModel.loadUser("1")
 
+    advanceUntilIdle() // testDispatchers 与 runTest 共用 scheduler 时推进排队任务
+
     assertEquals(UserUiState.Content(repository.user), viewModel.uiState.value)
 }
 ```
@@ -336,8 +363,10 @@ fun loadUser_success_updatesContentState() = runTest {
 
 - `runTest` 适合测试协程。
 - Main Dispatcher 在单元测试中通常需要替换。
+- 上例是测试流程示意；testDispatchers 应与 runTest 共享 TestCoroutineScheduler，ViewModel 使用 Main 时还需要测试规则设置 / 恢复 Main。不能调用异步 load 后立刻假定状态已更新。
 - Flow 的连续发射可以用 Turbine 或手动收集验证，具体工具按项目依赖决定。
 
+<a id="section-面试可能怎么问-9"></a>
 ###### 面试可能怎么问
 
 - 协程代码怎么设计才方便单元测试？
@@ -358,6 +387,7 @@ fun loadUser_success_updatesContentState() = runTest {
 - Repository 是否避免直接处理 UI。
 - 是否有明确的 loading、error、empty、content 状态。
 
+<a id="section-面试可能怎么问-10"></a>
 ###### 面试可能怎么问
 
 - Code Review Android 协程代码时重点看什么？

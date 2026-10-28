@@ -1,11 +1,25 @@
 # AGENT.md
 
+<!-- page-toc:start -->
+**目录**
+
+- [Project](#section-project)
+- [Core Rules](#section-core-rules)
+- [Repository Workflow](#section-repository-workflow)
+- [Hooks](#section-hooks)
+- [Skill Routing](#section-skill-routing)
+- [Boundaries](#section-boundaries)
+<!-- page-toc:end -->
+
+
+<a id="section-project"></a>
 ## Project
 
 This repository is a personal Android technical knowledge base. It is used for
 long-term note taking, review, interview preparation, troubleshooting records,
 and source-reading summaries.
 
+<a id="section-core-rules"></a>
 ## Core Rules
 
 - Write main note content in Chinese.
@@ -21,6 +35,7 @@ and source-reading summaries.
 - Do not silently change personal learning progress in `docs/roadmap.md`; ask
   before marking items as learning or completed.
 
+<a id="section-repository-workflow"></a>
 ## Repository Workflow
 
 - Create new notes with `scripts/new-note.ps1` when possible.
@@ -32,6 +47,7 @@ and source-reading summaries.
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\<script-name>.ps1
 ```
 
+<a id="section-hooks"></a>
 ## Hooks
 
 - Project-local Codex hooks live in `.codex/hooks.json`.
@@ -44,6 +60,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\<script-name>.ps1
 - If Codex asks to review or trust project hooks, inspect them with `/hooks`
   before enabling them.
 
+<a id="section-skill-routing"></a>
 ## Skill Routing
 
 - For creating, organizing, updating, indexing, checking, or generating Markdown
@@ -58,6 +75,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\<script-name>.ps1
   template selection, interview-note synchronization, learning-record handling,
   and final verification.
 
+<a id="section-boundaries"></a>
 ## Boundaries
 
 - Do not rewrite unrelated notes while working on a specific note.

@@ -1,9 +1,26 @@
 ### 知识库维护规则
 
+<!-- page-toc:start -->
+**目录**
+
+- [目标](#section-目标)
+- [目录分层](#section-目录分层)
+- [命名规则](#section-命名规则)
+- [笔记类型和模板](#section-笔记类型和模板)
+- [导航锚点规则](#section-导航锚点规则)
+- [创建笔记流程](#section-创建笔记流程)
+- [自动索引规则](#section-自动索引规则)
+- [AI 生成内容规则](#section-ai-生成内容规则)
+- [拆分规则](#section-拆分规则)
+<!-- page-toc:end -->
+
+
+<a id="section-目标"></a>
 ###### 目标
 
 这个仓库用于记录 Android 开发工程师的长期技术积累。内容要方便检索、持续补充和复盘，不追求一次写满。
 
+<a id="section-目录分层"></a>
 ###### 目录分层
 
 - `docs/<module>/README.md`：模块说明、导航、学习重点、待整理。
@@ -13,6 +30,7 @@
 - `templates/`：笔记模板。
 - `scripts/`：创建笔记和更新索引的脚本。
 
+<a id="section-命名规则"></a>
 ###### 命名规则
 
 - 目录名优先使用英文小写加短横线，例如 `android-framework/`。
@@ -20,6 +38,7 @@
 - 标题使用中文。普通笔记和模块 `README.md` 都使用较小标题层级，例如 `### Activity 生命周期`。
 - 图片和截图放到 `assets/`，按模块继续建子目录。
 
+<a id="section-笔记类型和模板"></a>
 ###### 笔记类型和模板
 
 | 类型    | 参数值               | 模板                                      |
@@ -30,7 +49,10 @@
 | 面试知识点 | `interview`       | `templates/interview-template.md`       |
 | 学习记录  | `learning-record` | `templates/learning-record-template.md` |
 
+<a id="section-导航锚点规则"></a>
 ###### 导航锚点规则
+
+所有阅读文档在标题下方保留可点击的页内目录，由 `scripts/update-toc.py` 自动生成（需要 Python 3）。新增或修改章节后运行 `scripts/update-index.ps1`，它会同时刷新页内目录；也可单独运行 `python scripts/update-toc.py`。生成区域用 `page-toc:start/end` 注释标识，不手工编辑。已有锚点保持不变，同名章节使用不同锚点，代码块内的示例标题不进入目录。
 
 所有文件内导航和带 `#` 的跨文件跳转，都要使用显式 HTML anchor，不依赖 Markdown 渲染器自动生成标题锚点。
 
@@ -67,6 +89,7 @@
 ###### HashMap 底层结构
 ```
 
+<a id="section-创建笔记流程"></a>
 ###### 创建笔记流程
 
 优先使用脚本创建笔记：
@@ -99,6 +122,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new-note.ps1 -Modu
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new-note.ps1 -Module learning-records -Title "协程学习记录" -Slug coroutine-learning -Type learning-record
 ```
 
+<a id="section-自动索引规则"></a>
 ###### 自动索引规则
 
 新增、移动、删除笔记后运行：
@@ -113,6 +137,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\update-index.ps1
 - 更新 `docs/index.md` 的模块表。
 - 不修改正文内容。
 
+<a id="section-ai-生成内容规则"></a>
 ###### AI 生成内容规则
 
 当只需要创建 Markdown 文件时，先使用模板生成空骨架。
@@ -134,6 +159,7 @@ docs/java/知识点梳理/集合.md -> docs/java/面试/集合面试题.md
 - 如果对应面试题文件不存在，但该知识点明显适合面试复盘，根据本次任务范围决定创建或提示待补。
 - 如果用户明确要求只改格式、只改错别字或不要更新面试内容，则不强行扩展面试题。
 
+<a id="section-拆分规则"></a>
 ###### 拆分规则
 
 一个 Markdown 文件只记录一个相对明确的知识点。出现下面情况时优先拆分：

@@ -1,7 +1,16 @@
 ### 贡献和维护规则
 
+<!-- page-toc:start -->
+**目录**
+
+- [基本要求](#section-基本要求)
+- [模板选择](#section-模板选择)
+<!-- page-toc:end -->
+
+
 本仓库用于长期沉淀个人技术知识。新增内容时优先遵循 [docs/knowledge-rules.md](./docs/knowledge-rules.md)。
 
+<a id="section-基本要求"></a>
 ###### 基本要求
 
 - 目录名优先使用英文小写加短横线，例如 `android-framework/`。
@@ -13,6 +22,7 @@
 - 如果 PowerShell 执行策略禁止直接运行脚本，使用 `powershell -NoProfile -ExecutionPolicy Bypass -File ...`。
 - 单篇笔记保持聚焦；内容变长时拆成多个知识点文件或专题目录。
 
+<a id="section-模板选择"></a>
 ###### 模板选择
 
 - 普通知识点：`templates/topic-template.md`

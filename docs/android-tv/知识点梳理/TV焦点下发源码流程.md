@@ -1,29 +1,10 @@
 ### Android TV 焦点下发源码流程
 
-###### 内容概述
+<!-- page-toc:start -->
+**目录**
 
-本文件整理 Android TV 焦点从“请求”“搜索”“候选收集”“焦点确认”到“父链记录”的源码级流程。TV 焦点不是单个 `requestFocus()` 就能解释清楚的问题，而是一套由 `View`、`ViewGroup`、`FocusFinder`、`RecyclerView` 和 `RecyclerView.LayoutManager` 共同参与的链路。
-
-核心关注点：
-
-- `View.requestFocus()`：目标 View 主动申请成为当前焦点。
-- `ViewGroup.requestFocus()`：父容器决定自己拿焦点，还是把焦点下发给子 View。
-- `onRequestFocusInDescendants()`：焦点进入容器时，容器选择哪个子 View 优先拿焦点。
-- `focusSearch()`：已有焦点后，根据方向键寻找下一个焦点。
-- `FocusFinder.findNextFocus()`：从候选 View 中按几何规则找最合适的目标。
-- `addFocusables()`：把可聚焦 View 加入候选集合。
-- `requestChildFocus()`：子 View 成功拿到焦点后，父容器沿父链记录焦点路径。
-
-###### 使用场景
-
-- 页面首次进入时，下发默认焦点到第一个可操作控件。
-- 用户按遥控器方向键时，从当前焦点移动到下一个焦点。
-- 某个 `ViewGroup` 获得焦点机会时，把焦点交给内部更合理的子 View。
-- RecyclerView 刷新、复用、滚动后，当前 item 焦点丢失或落错。
-- 弹窗关闭、页面返回、播放器控制层隐藏后，恢复到之前的焦点位置。
-
-一级栏目导航：
-
+- [内容概述](#section-内容概述)
+- [使用场景](#section-使用场景)
 - [源码角色总览](#源码角色总览)
 - [焦点下发从哪里开始](#焦点下发从哪里开始)
 - [主动请求焦点 requestFocus 流程](#主动请求焦点-requestfocus-流程)
@@ -40,8 +21,34 @@
 - [页面返回后的焦点恢复](#页面返回后的焦点恢复)
 - [TV 工程实践规范](#tv-工程实践规范)
 - [调试方法](#调试方法)
-- [面试可能怎么问](#面试可能怎么问)
+- [调试方法：面试可能怎么问](#面试可能怎么问)
 - [父容器更新焦点记录的作用](#父容器更新焦点记录的作用)
+<!-- page-toc:end -->
+
+
+<a id="section-内容概述"></a>
+###### 内容概述
+
+本文件整理 Android TV 焦点从“请求”“搜索”“候选收集”“焦点确认”到“父链记录”的源码级流程。TV 焦点不是单个 `requestFocus()` 就能解释清楚的问题，而是一套由 `View`、`ViewGroup`、`FocusFinder`、`RecyclerView` 和 `RecyclerView.LayoutManager` 共同参与的链路。
+
+核心关注点：
+
+- `View.requestFocus()`：目标 View 主动申请成为当前焦点。
+- `ViewGroup.requestFocus()`：父容器决定自己拿焦点，还是把焦点下发给子 View。
+- `onRequestFocusInDescendants()`：焦点进入容器时，容器选择哪个子 View 优先拿焦点。
+- `focusSearch()`：已有焦点后，根据方向键寻找下一个焦点。
+- `FocusFinder.findNextFocus()`：从候选 View 中按几何规则找最合适的目标。
+- `addFocusables()`：把可聚焦 View 加入候选集合。
+- `requestChildFocus()`：子 View 成功拿到焦点后，父容器沿父链记录焦点路径。
+
+<a id="section-使用场景"></a>
+###### 使用场景
+
+- 页面首次进入时，下发默认焦点到第一个可操作控件。
+- 用户按遥控器方向键时，从当前焦点移动到下一个焦点。
+- 某个 `ViewGroup` 获得焦点机会时，把焦点交给内部更合理的子 View。
+- RecyclerView 刷新、复用、滚动后，当前 item 焦点丢失或落错。
+- 弹窗关闭、页面返回、播放器控制层隐藏后，恢复到之前的焦点位置。
 
 <a id="源码角色总览"></a>
 ###### 源码角色总览

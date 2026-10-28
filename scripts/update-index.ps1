@@ -39,7 +39,7 @@ function Get-ModuleDescription {
     $heading = [regex]::Escape($script:ModuleDescriptionTitle)
     $match = [regex]::Match($text, "(?ms)^#{1,6}\s+$heading\s*\r?\n(.+?)(?=^#{1,6}\s+)")
     if ($match.Success) {
-        return (($match.Groups[1].Value -replace '\r?\n', ' ').Trim())
+        return ((($match.Groups[1].Value -replace '<a id="[^"]+"></a>', '') -replace '\r?\n', ' ').Trim())
     }
 
     return ''
@@ -94,13 +94,13 @@ function Update-ModuleReadme {
     $content = Get-Content -Raw -Encoding UTF8 -LiteralPath $readmePath
 
     $heading = [regex]::Escape($script:NavigationTitle)
-    $pattern = "(?ms)(^#{1,6}\s+$heading\s*\r?\n).*?(?=^#{1,6}\s+)"
+    $pattern = '(?ms)(^#{1,6}\s+' + $heading + '\s*\r?\n).*?(?=^(?:<a id="[^"]+"></a>\r?\n)?#{1,6}\s+)'
     $updated = [regex]::Replace($content, $pattern, {
         param($match)
         return $match.Groups[1].Value + $navigation + "`n`n"
     }, 1)
 
-    Set-Content -Encoding UTF8 -LiteralPath $readmePath -Value $updated
+    [System.IO.File]::WriteAllText($readmePath, $updated.TrimEnd() + "`n", [System.Text.UTF8Encoding]::new($false))
 }
 
 $repoRoot = Get-RepoRoot
@@ -145,5 +145,11 @@ $index = @(
     ($rows -join "`n")
 ) -join "`n"
 
-Set-Content -Encoding UTF8 -LiteralPath $indexPath -Value $index
+[System.IO.File]::WriteAllText($indexPath, $index + "`n", [System.Text.UTF8Encoding]::new($false))
 Write-Output "Updated index: $indexPath"
+
+# Keep page navigation in sync after generated module navigation changes.
+& python (Join-Path $PSScriptRoot 'update-toc.py')
+if ($LASTEXITCODE -ne 0) {
+    throw 'Page TOC update failed. Python 3 is required.'
+}

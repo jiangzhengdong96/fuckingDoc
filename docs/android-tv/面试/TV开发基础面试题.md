@@ -1,16 +1,21 @@
 ### TV 开发基础面试题
 
-###### 内容概述
+<!-- page-toc:start -->
+**目录**
 
-这里记录 Android TV 开发基础相关面试题，包括 TV 和手机端差异、10-foot UI、焦点重要性、Leanback / Compose for TV 选型、Manifest 和发布注意点。
-
-面试题导航：
-
+- [内容概述](#section-内容概述)
 - [Android TV 和手机 App 开发有什么区别](#android-tv-和手机-app-开发有什么区别)
 - [什么是 10-foot UI](#什么是-10-foot-ui)
 - [TV 应用为什么要重点关注焦点](#tv-应用为什么要重点关注焦点)
 - [Leanback 和 Compose for TV 怎么选](#leanback-和-compose-for-tv-怎么选)
 - [TV 应用 Manifest 和发布要注意什么](#tv-应用-manifest-和发布要注意什么)
+<!-- page-toc:end -->
+
+
+<a id="section-内容概述"></a>
+###### 内容概述
+
+这里记录 Android TV 开发基础相关面试题，包括 TV 和手机端差异、10-foot UI、焦点重要性、Leanback / Compose for TV 选型、Manifest 和发布注意点。
 
 <a id="android-tv-和手机-app-开发有什么区别"></a>
 ###### Android TV 和手机 App 开发有什么区别

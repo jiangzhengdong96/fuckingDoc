@@ -1,11 +1,9 @@
 ### Lambda / Stream / Optional 面试题
 
-###### 内容概述
+<!-- page-toc:start -->
+**目录**
 
-这里记录 Java Lambda、函数式接口、方法引用、Stream、Optional 相关面试题，用来复盘 Java 8 现代语法、流式处理、空值表达以及 Android 项目中的使用边界。
-
-面试题导航：
-
+- [内容概述](#section-内容概述)
 - [Lambda 表达式解决了什么问题](#lambda-表达式解决了什么问题)
 - [Lambda 和匿名内部类有什么区别](#lambda-和匿名内部类有什么区别)
 - [什么是函数式接口](#什么是函数式接口)
@@ -20,6 +18,13 @@
 - [orElse 和 orElseGet 有什么区别](#orelse-和-orelseget-有什么区别)
 - [Optional 能不能完全替代 null](#optional-能不能完全替代-null)
 - [Android 低版本使用 Stream 和 Optional 要注意什么](#android-低版本使用-stream-和-optional-要注意什么)
+<!-- page-toc:end -->
+
+
+<a id="section-内容概述"></a>
+###### 内容概述
+
+这里记录 Java Lambda、函数式接口、方法引用、Stream、Optional 相关面试题，用来复盘 Java 8 现代语法、流式处理、空值表达以及 Android 项目中的使用边界。
 
 <a id="lambda-表达式解决了什么问题"></a>
 ###### Lambda 表达式解决了什么问题

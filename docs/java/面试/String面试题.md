@@ -1,16 +1,21 @@
 ### String 面试题
 
-###### 内容概述
+<!-- page-toc:start -->
+**目录**
 
-这里记录 String 为什么不可变、new String abc 创建几个对象、StringBuilder 和 StringBuffer 有什么区别、字符串拼接什么时候会创建新对象、intern 有什么作用 等面试题。
-
-面试题导航：
-
+- [内容概述](#section-内容概述)
 - [String 为什么不可变](#string-为什么不可变)
 - [new String abc 创建几个对象](#new-string-abc-创建几个对象)
 - [StringBuilder 和 StringBuffer 有什么区别](#stringbuilder-和-stringbuffer-有什么区别)
 - [字符串拼接什么时候会创建新对象](#字符串拼接什么时候会创建新对象)
 - [intern 有什么作用](#intern-有什么作用)
+<!-- page-toc:end -->
+
+
+<a id="section-内容概述"></a>
+###### 内容概述
+
+这里记录 String 为什么不可变、new String abc 创建几个对象、StringBuilder 和 StringBuffer 有什么区别、字符串拼接什么时候会创建新对象、intern 有什么作用 等面试题。
 
 <a id="string-为什么不可变"></a>
 ###### String 为什么不可变

@@ -1,17 +1,10 @@
 ### Android TV 开发基础知识点清单
 
-###### 内容概述
+<!-- page-toc:start -->
+**目录**
 
-本文件记录 Android TV 开发基础，包括 TV 端定位、和手机端差异、10-foot UI、输入方式、工程配置、Leanback、Compose for TV、设备适配和开发边界。
-
-###### 使用场景
-
-- 新接手 Android TV 项目时，用于快速建立 TV 端开发基本认知。
-- 做手机端应用迁移到 TV 端时，用于判断哪些交互和界面需要重做。
-- 做 TV 面试复盘时，用于说明 TV 端和普通 Android App 的核心差异。
-
-一级栏目导航：
-
+- [内容概述](#section-内容概述)
+- [使用场景](#section-使用场景)
 - [TV 端开发定位](#tv-端开发定位)
 - [TV 和手机端差异](#tv-和手机端差异)
 - [10-foot UI](#10-foot-ui)
@@ -22,7 +15,21 @@
 - [Leanback 和 Compose for TV](#leanback-和-compose-for-tv)
 - [设备适配](#设备适配)
 - [开发边界](#开发边界)
-- [面试可能怎么问](#面试可能怎么问)
+- [开发边界：面试可能怎么问](#面试可能怎么问)
+<!-- page-toc:end -->
+
+
+<a id="section-内容概述"></a>
+###### 内容概述
+
+本文件记录 Android TV 开发基础，包括 TV 端定位、和手机端差异、10-foot UI、输入方式、工程配置、Leanback、Compose for TV、设备适配和开发边界。
+
+<a id="section-使用场景"></a>
+###### 使用场景
+
+- 新接手 Android TV 项目时，用于快速建立 TV 端开发基本认知。
+- 做手机端应用迁移到 TV 端时，用于判断哪些交互和界面需要重做。
+- 做 TV 面试复盘时，用于说明 TV 端和普通 Android App 的核心差异。
 
 <a id="tv-端开发定位"></a>
 ###### TV 端开发定位

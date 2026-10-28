@@ -1,17 +1,22 @@
 ### Codex 面试题
 
-###### 内容概述
+<!-- page-toc:start -->
+**目录**
 
-这里记录 Codex 相关面试题，覆盖工具定位、使用流程、上下文组织、风险控制、人工 Review 和 Android 项目实践。
-
-面试题导航：
-
+- [内容概述](#section-内容概述)
 - [Codex 和普通 Chatbot 有什么区别](#codex-和普通-chatbot-有什么区别)
 - [使用 Codex 修改项目的基本流程是什么](#使用-codex-修改项目的基本流程是什么)
 - [为什么要让 Codex 先读项目规则和现有代码](#为什么要让-codex-先读项目规则和现有代码)
 - [Prompt 里应该给 Codex 哪些信息](#prompt-里应该给-codex-哪些信息)
 - [怎么降低 Codex 生成错误代码的风险](#怎么降低-codex-生成错误代码的风险)
 - [Android 项目里怎么用 Codex 排查问题](#android-项目里怎么用-codex-排查问题)
+<!-- page-toc:end -->
+
+
+<a id="section-内容概述"></a>
+###### 内容概述
+
+这里记录 Codex 相关面试题，覆盖工具定位、使用流程、上下文组织、风险控制、人工 Review 和 Android 项目实践。
 
 <a id="codex-和普通-chatbot-有什么区别"></a>
 ###### Codex 和普通 Chatbot 有什么区别
