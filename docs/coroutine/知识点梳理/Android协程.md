@@ -99,8 +99,13 @@ implementation("androidx.lifecycle:lifecycle-runtime-ktx:<version>")
 |---|---|---|---|
 | `viewModelScope` | ViewModel 清除时取消 | ViewModel | 请求数据、保存状态、业务组合 |
 | `lifecycleScope` | Lifecycle 销毁时取消 | Activity / Fragment | 和页面生命周期绑定的任务 |
+| `viewLifecycleOwner.lifecycleScope` | Fragment View 销毁时取消 | Fragment | 收集状态并更新当前 View，避免持有旧 binding |
 | `rememberCoroutineScope` | Compose 组合离开时取消 | Compose | 响应点击、Snackbar、滚动等 UI 事件 |
 | 自定义 `CoroutineScope` | 自己负责取消 | Repository / Manager | 长生命周期任务，必须明确释放 |
+| `MainScope()` | 自己负责取消，不自动绑定页面 | 自定义 UI owner | 创建 SupervisorJob + Main 的作用域 |
+| `GlobalScope` | 无调用方父 Job，不随页面销毁取消 | 明确需要独立任务的特殊场景 | 不保证进程退出前完成，调用方也不会自动等待 |
+
+作用域负责“任务归谁管”；`launch`、`async` 负责启动任务，`withContext` 负责切换上下文并等待，`runBlocking` 负责阻塞式入口桥接。完整参数、示例和输出顺序见 [协程作用域与常用方法](./协程作用域与常用方法.md)。Compose 的 `LaunchedEffect` 等入口也在该文中说明。
 
 优先级：
 

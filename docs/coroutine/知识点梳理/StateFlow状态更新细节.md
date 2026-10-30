@@ -31,6 +31,8 @@
 
 StateFlow 必须有初始值，可通过 value 读取当前值；新订阅者获得当前状态。更新按 equals 判断，相等时不会再次通知。
 
+这里的当前值包括订阅之前已更新的最新值，不要求发送时就有人订阅；例如先写入 1、2 再订阅，会收到 2。与 SharedFlow replay 的完整对比见 [先发送后订阅会收到什么](./Flow冷流热流与操作符.md#先发送后订阅)。
+
 ```kotlin
 data class UiState(val loading: Boolean = false, val items: List<Item> = emptyList())
 private val _state = MutableStateFlow(UiState())

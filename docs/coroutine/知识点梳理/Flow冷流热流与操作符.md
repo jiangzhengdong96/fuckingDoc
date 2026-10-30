@@ -6,6 +6,9 @@
 - [内容概述](#section-内容概述)
 - [使用场景](#section-使用场景)
 - [冷流与热流](#冷流与热流)
+- [flow 的创建、发射与收集](#flow创建发射与收集)
+- [先发送后订阅会收到什么](#先发送后订阅)
+- [背压与数据流术语](#背压与数据流术语)
 - [共享上游与启动策略](#共享上游与启动策略)
 - [操作符选择](#操作符选择)
 - [异常与重试](#异常与重试)
@@ -27,11 +30,11 @@
 <a id="冷流与热流"></a>
 ###### 冷流与热流
 
-| 类型 | 启动与共享 | 新订阅者收到什么 |
-|---|---|---|
-| `flow { ... }` 等典型冷流 | 每次 collect 独立执行上游代码 | 本次执行产生的数据 |
-| `SharedFlow` | 多个订阅者共享发射，生产者生命周期由 owner 管理 | replay 历史和之后的新值 |
-| `StateFlow` | 共享一个当前状态 | 当前值及之后变化，按 equals 合并 |
+| 类型                   | 启动与共享                       | 新订阅者收到什么             |
+| -------------------- | --------------------------- | -------------------- |
+| `flow { ... }` 等典型冷流 | 每次 collect 独立执行上游代码         | 本次执行产生的数据            |
+| `SharedFlow`         | 多个订阅者共享发射，生产者生命周期由 owner 管理 | replay 历史和之后的新值      |
+| `StateFlow`          | 共享一个当前状态                    | 当前值及之后变化，按 equals 合并 |
 
 ```kotlin
 val detail = flow { emit(repository.loadDetail()) }
@@ -41,6 +44,135 @@ val detail = flow { emit(repository.loadDetail()) }
 Flow 类型本身不承诺冷流；StateFlow、SharedFlow 也实现 Flow。不要仅凭变量声明为 Flow 就认定重复收集一定会重新请求，要看上游实现。
 
 默认冷流中 emit 与下游算子顺序执行，慢 collect 会拖慢上游；引入 buffer、flowOn、共享转换后才可能分开执行。Flow 不自动切后台，阻塞操作仍需适当 Dispatcher。
+
+<a id="flow创建发射与收集"></a>
+###### flow 的创建、发射与收集
+
+`flow { ... }` 是创建冷流的构建器，不是“立即发消息”的语句。可以把它看成保存一段生产数据的逻辑，等 collect 时才执行；每次 collect 都重新执行这段逻辑。
+
+```kotlin
+// 放在协程或 suspend 函数中运行；导入 kotlinx.coroutines.flow.*。
+val numbers: Flow<Int> = flow {
+    println("上游开始")
+    emit(1)
+    emit(2)
+    println("上游结束")
+}
+
+println("只创建了 Flow")
+numbers.collect { println("A 收到 $it") }
+numbers.collect { println("B 收到 $it") }
+```
+
+在没有额外 buffer、flowOn 等改变执行方式的情况下，输出依次为：
+
+```text
+只创建了 Flow
+上游开始
+A 收到 1
+A 收到 2
+上游结束
+上游开始
+B 收到 1
+B 收到 2
+上游结束
+```
+
+这里 B 收到 1、2，是上游重新执行产生了新一轮数据，**不是重放 A 的历史消息**。两次 collect 写在一起是先后执行；要同时收集，应分别 launch。若第一个流永不结束，顺序写在它后面的第二个 collect 就不会开始。
+
+| 写法                               | 作用                     | 是否立即启动收集          |
+| -------------------------------- | ---------------------- | ----------------- |
+| `flow { emit(value) }`           | 定义可以挂起的生产逻辑            | 否                 |
+| `flowOf(1, 2)`                   | 从给定值创建流                | 否，但参数表达式先求值       |
+| `list.asFlow()`                  | 收集时遍历已有集合              | 否，不代表重新加载集合       |
+| `map { ... }` / `filter { ... }` | 为流添加转换 / 过滤            | 否，典型中间操作符随收集执行    |
+| `collect { ... }`                | 挂起当前协程，接收并处理值          | 是，通常到流完成或被取消才返回   |
+| `first()`                        | 取得第一个值后停止本次收集          | 是，空的有限流会抛异常       |
+| `take(n).toList()`               | 收集前 n 个值，或上游提前结束前的值    | 是，无限流凑不齐 n 个时仍会等待 |
+| `onEach { ... }.launchIn(scope)` | 在指定 scope 中启动收集并返回 Job | 是，可通过 Job 取消      |
+
+`flowOf(load())` 与 `flow { emit(load()) }` 不等价：前者先执行 load 得到参数，再创建流；后者把 load 放在收集时执行。因此“冷流”也不代表创建表达式周围的全部代码都被延迟。
+
+`emit` 是挂起函数。默认顺序流中，它会推进下游处理，等该值对应的下游处理返回后才继续；加了缓冲或共享后，返回语义不能再等同于“UI 已处理完”。`emit` 能发送多个值，普通 suspend 函数调用则只返回一次结果。
+
+```kotlin
+fun observeDetail(): Flow<Detail> = flow {
+    emit(api.loadDetail())
+}
+```
+
+这个例子只发一次就结束，**不会因为返回 Flow 就自动监听服务器变化**。如果需求只是获取一次详情，直接用 suspend 更简洁；持续变化来自 Room 表观察、回调、明确的轮询逻辑等真实数据源。
+
+同一个冷 Flow 对象也不共享执行结果：A、B 分别 collect，通常请求两次。要共享一次上游运行，需让 A、B 拿到同一个 stateIn / shareIn 产物；各自转换一次仍是两份共享流。流对象的共享范围与应用、账号、ViewModel 等 owner 的生命周期有关。
+
+<a id="先发送后订阅"></a>
+###### 先发送后订阅会收到什么
+
+StateFlow 始终保存当前值，即使更新时没有订阅者也会保存。新订阅者获得订阅时的最新状态，不会按历史顺序补发所有变化。
+
+```kotlin
+val state = MutableStateFlow(0)
+state.value = 1
+state.value = 2 // 此时仍没有订阅者
+
+println(state.value)   // 2，直接读取，不会订阅
+println(state.first()) // 2，开始收集当前值后立即结束本次收集
+```
+
+| 同一实例，先发 1、2，再开始订阅 | 新订阅者的行为 |
+|---|---|
+| `MutableStateFlow(0)` | 先收到当前值 2；未更新过则收到初始值 0 |
+| `MutableSharedFlow<Int>()` | 收不到之前的 1、2，等待之后的新值 |
+| `MutableSharedFlow<Int>(replay = 1)` | 先收到最近的 2 |
+| `MutableSharedFlow<Int>(replay = 2)` | 先按顺序收到 1、2 |
+| `MutableSharedFlow<Int>(extraBufferCapacity = 4)` | 无订阅者时额外缓冲不保存历史，仍收不到之前的值 |
+
+```kotlin
+val history = MutableSharedFlow<Int>(replay = 2)
+history.emit(1)
+history.emit(2)
+println(history.take(2).toList()) // [1, 2]，取得两条后结束收集
+```
+
+StateFlow 可以从行为上类比为“保留一个最新值，并进行相等合并的状态流”，但不是简单把 SharedFlow 的 replay 设为 1：它还必须有初始值、提供 value、固定相等合并规则，且不支持 resetReplayCache。
+
+注意三个边界：
+
+- collect 是持续订阅；直接读 value 只是某个时刻的快照，不会自动监听变化。
+- 若订阅恰好与并发更新竞争，首先观察到哪个版本取决于时序，不能保证一定看到较早的中间状态。
+- 上面的行为以同一个流实例为前提；页面重建若创建了新 ViewModel、新流，旧内存值不会自动迁移。stateIn 的缓存还可能按 WhileSubscribed 的配置重置，进程死亡也不会自动保留内存状态。
+
+<a id="背压与数据流术语"></a>
+###### 背压与数据流术语
+
+慢订阅者是消费速度较慢的一方，是产生压力的原因；背压是下游能力对上游施加的约束。缓冲只能吸收短期速度差，长期生产更快时最终仍要等待、丢弃、合并或降低生产速率。
+
+| 术语 | 含义 | Flow 中的例子 |
+|---|---|---|
+| 上游 / 下游 | 相对某个操作符，数据从哪里来、向哪里去 | flow → map → collect |
+| 生产者 / 消费者 | 产生数据 / 处理数据的一方 | emit / collect |
+| 背压（Backpressure） | 下游处理能力约束上游速度 | 默认顺序流等待下游、SUSPEND 策略下缓冲满后 emit 挂起 |
+| 缓冲（Buffering） | 暂存尚未处理的值 | buffer(4)、extraBufferCapacity |
+| 溢出（Overflow） | 缓冲已满，需要决定等待或丢弃 | SUSPEND、DROP_OLDEST、DROP_LATEST |
+| 合并（Conflation） | 忙时保留较新值，跳过待处理的中间值 | conflate、StateFlow 的慢消费者行为 |
+| 去重（Deduplication） | 抑制相等的相邻值 | distinctUntilChanged、StateFlow 的 equals 合并 |
+| 最新优先（Latest） | 新值到达时取消旧值正在进行的处理 | collectLatest、mapLatest、flatMapLatest |
+| 重放（Replay） | 给新订阅者发送保留的历史值 | SharedFlow(replay = 2) |
+| 防抖（Debounce） | 等待一段时间没有新值后发出最新值 | debounce(300) |
+| 采样（Sampling） | 按时间窗口取较新值 | sample(1_000)，末尾值不保证在结束前被采到 |
+| 多播 / 广播（Multicast / Broadcast） | 多个订阅者共享一份生产数据 | SharedFlow；不同于 Channel 的竞争接收 |
+
+假设正在处理 A，期间 B、C 连续到达：
+
+```text
+buffer（容量足够、未丢弃）：处理完 A，再处理 B、C
+conflate：继续处理 A；若 B 还没开始处理，等待中的值可合并为 C
+collectLatest：新值触发取消旧处理；B 若已开始，也可能再被 C 取消
+```
+
+具体执行顺序受调度和取消配合影响，Latest 不是强行终止线程，也不能撤销已经发生的副作用。
+
+StateFlow 不会因订阅者慢而挂起更新方，它允许跳过中间状态；SharedFlow 可用 SUSPEND 在缓冲满时让发送方等待。丢弃和合并通常属于应对速度差的策略，不要把所有策略都理解成“生产方一定会被阻塞”。挂起等待也不等于阻塞执行线程。
 
 <a id="共享上游与启动策略"></a>
 ###### 共享上游与启动策略
@@ -165,5 +297,9 @@ UI 使用 repeatOnLifecycle；多个长期 Flow 应分别 launch 收集，不能
 - 搜索使用 debounce 和 flatMapLatest 能保证旧结果绝不出现吗？
 - Flow 的 catch 和 retryWhen 能处理哪些异常？
 - callbackFlow 为什么需要 awaitClose？
+- flow 创建时会执行吗，两个 collect 是重放还是重新执行？
+- StateFlow 在没有订阅者时更新，新订阅者为什么还能收到？
+- 慢订阅者、背压、缓冲、合并和去重有什么区别？
+- 返回 Flow 是否就代表自动监听数据变化，flowOf(load()) 会延迟执行吗？
 
 对应答案见 [Flow 与协程进阶面试题](../面试/Flow与协程进阶面试题.md)。

@@ -26,6 +26,18 @@
 - [Semaphore 和 limitedParallelism 都能限制上传并发数吗？](#advanced-q18)
 - [Channel 与 SharedFlow 的多消费者语义有什么区别？](#advanced-q19)
 - [Channel 发送成功是否保证事件被业务消费一次？](#advanced-q20)
+- [flow 创建时会执行吗，两个 collect 是重放还是重新执行？](#flow执行与重复收集)
+- [StateFlow 在没有订阅者时更新，新订阅者为什么还能收到？](#stateflow晚订阅)
+- [慢订阅者、背压、缓冲、合并和去重有什么区别？](#背压缓冲与合并)
+- [返回 Flow 是否就代表自动监听数据变化，flowOf(load()) 会延迟执行吗？](#flow不自动监听)
+- [CoroutineScope、launch、withContext、runBlocking 分别是什么，能混称为作用域吗？](#scope-api-types)
+- [async 什么时候开始执行，await 是启动任务还是等待结果？](#async-start-await)
+- [withContext 和 runBlocking 都等待结果，区别在哪里？](#context-versus-blocking)
+- [为什么 GlobalScope 内部加 delay，外层演示入口仍可能提前结束？](#global-demo-wait)
+- [coroutineScope 和 supervisorScope 如何等待子任务并处理失败？](#local-scope-failure)
+- [Job 和 SupervisorJob 有什么区别，监督会自动处理异常吗？](#job-supervisor-intro)
+- [SupervisorJob 会隔离所有后代的失败吗，和 supervisorScope 怎么选？](#supervisor-depth)
+- [CoroutineContext 的加号是什么意思，Job 和 Dispatcher 分别负责什么？](#context-job-dispatcher)
 <!-- page-toc:end -->
 
 
@@ -231,3 +243,111 @@
 **深入追问：** 可靠处理需要确认、幂等和必要的持久化。onUndeliveredElement 主要清理未交付元素关联的资源，不是可靠重试或消费确认机制。
 
 **关联知识点：** [协程并发控制与共享状态](../知识点梳理/协程并发控制与共享状态.md#channel与广播)
+
+<a id="flow执行与重复收集"></a>
+###### flow 创建时会执行吗，两个 collect 是重放还是重新执行？
+
+**简答版：** flow 构建器保存生产逻辑，通常在 collect 时才运行。两个 collect 各执行一遍上游，后一次拿到数据是重新生产，不是重放前一次历史。
+
+**深入追问：** 同一 Flow 对象不意味着共享结果。顺序写两个 collect 时，第一个不结束就到不了第二个；并发收集需分别 launch。共享上游需复用同一个 stateIn / shareIn 产物。
+
+**关联知识点：** [Flow 冷流热流与操作符](../知识点梳理/Flow冷流热流与操作符.md#flow创建发射与收集)
+
+<a id="stateflow晚订阅"></a>
+###### StateFlow 在没有订阅者时更新，新订阅者为什么还能收到？
+
+**简答版：** StateFlow 一直保存当前值，新订阅者会收到最新状态；未更新过则收到初始值。默认 SharedFlow 的 replay 为 0，没有这种历史保留行为。
+
+**深入追问：** 先写入 1、2 再订阅 StateFlow，收到的是当前 2，不会补发 0、1。直接读 value 不是订阅；只有同一实例才谈得上读取旧状态，新实例或进程重启不会自动恢复，stateIn 还受缓存重置策略影响。
+
+**关联知识点：** [Flow 冷流热流与操作符](../知识点梳理/Flow冷流热流与操作符.md#先发送后订阅)
+
+<a id="背压缓冲与合并"></a>
+###### 慢订阅者、背压、缓冲、合并和去重有什么区别？
+
+**简答版：** 慢订阅者描述消费能力；背压指消费能力约束生产速度；缓冲暂存值；合并跳过待处理的中间值；去重抑制相等值。
+
+**深入追问：** StateFlow 既按 equals 去重，也允许慢收集者跳过不同的中间状态，不会等待慢订阅者。SharedFlow 在 SUSPEND 策略下缓冲满会挂起 emit。conflate 不取消当前消费块，collectLatest 会请求取消旧处理；这些都不能撤销已发生的业务副作用。
+
+**关联知识点：** [Flow 冷流热流与操作符](../知识点梳理/Flow冷流热流与操作符.md#背压与数据流术语)
+
+<a id="flow不自动监听"></a>
+###### 返回 Flow 是否就代表自动监听数据变化，flowOf(load()) 会延迟执行吗？
+
+**简答版：** 不是。flow { emit(load()) } 每次收集只调用一次 load，发出结果后结束，不会自动观察服务器；flowOf(load()) 则先求值 load，再创建流。
+
+**深入追问：** 持续更新必须来自 Room 观察、回调、轮询等生产机制。只有一次结果时通常用 suspend 更简单；判断副作用何时执行要看代码位于构建器内部还是参数求值阶段。
+
+**关联知识点：** [Flow 冷流热流与操作符](../知识点梳理/Flow冷流热流与操作符.md#flow创建发射与收集)
+
+<a id="scope-api-types"></a>
+###### CoroutineScope、launch、withContext、runBlocking 分别是什么，能混称为作用域吗？
+
+**简答版：** CoroutineScope 是任务归属入口；launch 是启动子协程的扩展函数并返回 Job；withContext 是等待指定上下文代码完成的挂起函数；runBlocking 是阻塞调用线程的桥接构建器。
+
+**深入追问：** scope 不等于线程池，suspend 也不自动启动任务。withContext 创建局部执行边界，不是需要长期持有的页面作用域。
+
+**关联知识点：** [协程作用域与常用方法](../知识点梳理/协程作用域与常用方法.md#概念与方法总览)
+
+<a id="async-start-await"></a>
+###### async 什么时候开始执行，await 是启动任务还是等待结果？
+
+**简答版：** 默认 async 调用后就按调度器安排启动，await 主要负责等待并取结果；LAZY 模式下 await 也会触发启动。
+
+**深入追问：** 先启动多个 async 再等待才能重叠执行；async 后立即 await，再创建下一个通常是串行。多次 await 同一 Deferred 不重复执行；普通父级下 async 失败也会向父级传播。
+
+**关联知识点：** [协程作用域与常用方法](../知识点梳理/协程作用域与常用方法.md#async并发获取结果)
+
+<a id="context-versus-blocking"></a>
+###### withContext 和 runBlocking 都等待结果，区别在哪里？
+
+**简答版：** withContext 挂起当前协程，不以阻塞调用线程的方式等待；runBlocking 阻塞调用线程直到块及子任务完成，用于普通入口桥接。
+
+**深入追问：** runBlocking 默认通过线程内事件循环推进工作，但线程仍被这个调用占用。即使传 IO 也不能避免阻塞原调用线程；已有协程通常用 withContext / coroutineScope，不要嵌套 runBlocking。
+
+**关联知识点：** [协程作用域与常用方法](../知识点梳理/协程作用域与常用方法.md#runblocking演示入口)
+
+<a id="global-demo-wait"></a>
+###### 为什么 GlobalScope 内部加 delay，外层演示入口仍可能提前结束？
+
+**简答版：** GlobalScope 任务不属于外层入口的任务树，launch 立即返回；内部 delay 只挂起独立任务，不会让外层方法等待。
+
+**深入追问：** 学习演示可用 runBlocking 加普通 launch；若专门展示 GlobalScope，则保存 Job 并显式 join。runBlocking 只会自动等待自己的子任务，不能自动等待所有全局任务。
+
+**关联知识点：** [协程作用域与常用方法](../知识点梳理/协程作用域与常用方法.md#runblocking演示入口)
+
+<a id="local-scope-failure"></a>
+###### coroutineScope 和 supervisorScope 如何等待子任务并处理失败？
+
+**简答版：** 两者都等待块及其子任务结束；coroutineScope 子任务失败通常取消整个局部任务树，supervisorScope 隔离直接子任务的失败。
+
+**深入追问：** 监督不吞异常，async 的 await 失败需明确处理；若异常逃出 supervisorScope 代码块，整个 scope 仍失败并取消其他任务。父级取消对两种 scope 都向下传播。
+
+**关联知识点：** [协程作用域与常用方法](../知识点梳理/协程作用域与常用方法.md#局部作用域与失败隔离)
+
+<a id="job-supervisor-intro"></a>
+###### Job 和 SupervisorJob 有什么区别，监督会自动处理异常吗？
+
+**简答版：** 普通 Job 下直接子任务的未处理非取消异常会使父级失败并取消兄弟任务；SupervisorJob 隔离直接子任务失败，父级与其他子任务可继续。两者主动取消时都会取消子任务。
+
+**深入追问：** 监督不恢复失败任务，也不自动生成错误态。launch 的未处理异常仍需适当 handler 或任务内部处理；async 需观察 await 的失败。
+
+**关联知识点：** [协程作用域与常用方法](../知识点梳理/协程作用域与常用方法.md#supervisorjob失败隔离)
+
+<a id="supervisor-depth"></a>
+###### SupervisorJob 会隔离所有后代的失败吗，和 supervisorScope 怎么选？
+
+**简答版：** 只改变直接子任务失败向监督父级的传播，不把所有后代变成监督关系。长期 owner 可用 SupervisorJob 配置 scope，一次挂起调用中的局部任务通常用 supervisorScope。
+
+**深入追问：** 监督父级下的 launch A 内部若有普通 async 子任务，子任务失败仍可能取消 A 和 A 内的其他任务；其他直接兄弟 B 可不受影响。supervisorScope 自身代码块抛异常仍使局部作用域失败。
+
+**关联知识点：** [协程作用域与常用方法](../知识点梳理/协程作用域与常用方法.md#supervisorjob与supervisorscope)
+
+<a id="context-job-dispatcher"></a>
+###### CoroutineContext 的加号是什么意思，Job 和 Dispatcher 分别负责什么？
+
+**简答版：** 加号组合上下文配置，同 key 的右侧覆盖左侧。Job 管生命周期和父子取消关系，Dispatcher 管代码执行与恢复的调度位置。
+
+**深入追问：** 创建 Job 或 scope 不执行任务；launch / async 创建子任务。Context 不是 Android Context，随意传新 Job 可能替换父级，Dispatcher 变化本身则不意味着任务脱离原 owner。
+
+**关联知识点：** [协程作用域与常用方法](../知识点梳理/协程作用域与常用方法.md#入门核心对象)
