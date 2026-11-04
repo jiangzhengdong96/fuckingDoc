@@ -1,0 +1,190 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+import kotlin.Metadata;
+import kotlin.ResultKt;
+import kotlin.Unit;
+import kotlin.collections.ArraysKt;
+import kotlin.coroutines.Continuation;
+import kotlin.coroutines.intrinsics.IntrinsicsKt;
+import kotlin.coroutines.jvm.internal.ContinuationImpl;
+import kotlin.coroutines.jvm.internal.SpillingKt;
+import kotlin.jvm.functions.Function2;
+import kotlin.jvm.internal.Intrinsics;
+import kotlinx.coroutines.BuildersKt;
+import kotlinx.coroutines.CoroutineScope;
+import kotlinx.coroutines.DelayKt;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+@Metadata(mv={2, 2, 0}, k=2, xi=48, d1={"\u0000\"\n\u0000\n\u0002\u0010\u000e\n\u0000\n\u0002\u0010\b\n\u0000\n\u0002\u0010\t\n\u0002\b\u0002\n\u0002\u0010\u0002\n\u0000\n\u0002\u0010\u0011\n\u0000\u001a\u001e\u0010\u0000\u001a\u00020\u00012\u0006\u0010\u0002\u001a\u00020\u00032\u0006\u0010\u0004\u001a\u00020\u0005H\u0086@\u00a2\u0006\u0002\u0010\u0006\u001a\u0019\u0010\u0007\u001a\u00020\b2\f\u0010\t\u001a\b\u0012\u0004\u0012\u00020\u00010\n\u00a2\u0006\u0002\u0010\u000b"}, d2={"greeting", "", "id", "", "waitMillis", "", "(IJLkotlin/coroutines/Continuation;)Ljava/lang/Object;", "main", "", "args", "", "([Ljava/lang/String;)V"})
+public final class StateMachineDemoKt {
+    /*
+     * Unable to fully structure code
+     */
+    @Nullable
+    public static final Object greeting(int id, long waitMillis, @NotNull Continuation<? super String> $completion) {
+        if (!($completion instanceof greeting.1)) ** GOTO lbl-1000
+        var8_3 = $completion;
+        if ((var8_3.label & -2147483648) != 0) {
+            var8_3.label -= -2147483648;
+        } else lbl-1000:
+        // 2 sources
+
+        {
+            $continuation = new ContinuationImpl($completion){
+                int I$0;
+                int I$1;
+                long J$0;
+                Object L$0;
+                /* synthetic */ Object result;
+                int label;
+
+                @Nullable
+                public final Object invokeSuspend(@NotNull Object $result) {
+                    this.result = $result;
+                    this.label |= Integer.MIN_VALUE;
+                    return StateMachineDemoKt.greeting(0, 0L, (Continuation<? super String>)((Continuation)this));
+                }
+            };
+        }
+        $result = $continuation.result;
+        var9_5 = IntrinsicsKt.getCOROUTINE_SUSPENDED();
+        switch ($continuation.label) {
+            case 0: {
+                ResultKt.throwOnFailure((Object)$result);
+                prefix = "user-" + id;
+                System.out.println((Object)("A before first delay: " + (String)prefix));
+                $continuation.L$0 = prefix;
+                $continuation.I$0 = id;
+                $continuation.J$0 = waitMillis;
+                $continuation.label = 1;
+                v0 = DelayKt.delay((long)waitMillis, (Continuation)$continuation);
+                if (v0 == var9_5) {
+                    return var9_5;
+                }
+                ** GOTO lbl28
+            }
+            case 1: {
+                waitMillis = $continuation.J$0;
+                id = $continuation.I$0;
+                prefix = (String)$continuation.L$0;
+                ResultKt.throwOnFailure((Object)$result);
+                v0 = $result;
+lbl28:
+                // 2 sources
+
+                score = id + 10;
+                System.out.println((Object)("B after first delay: " + (String)prefix + ", score=" + score));
+                $continuation.L$0 = prefix;
+                $continuation.I$0 = id;
+                $continuation.J$0 = waitMillis;
+                $continuation.I$1 = score;
+                $continuation.label = 2;
+                v1 = DelayKt.delay((long)waitMillis, (Continuation)$continuation);
+                if (v1 == var9_5) {
+                    return var9_5;
+                }
+                ** GOTO lbl46
+            }
+            case 2: {
+                score = $continuation.I$1;
+                waitMillis = $continuation.J$0;
+                id = $continuation.I$0;
+                prefix = (String)$continuation.L$0;
+                ResultKt.throwOnFailure((Object)$result);
+                v1 = $result;
+lbl46:
+                // 2 sources
+
+                answer = (String)prefix + ":" + score;
+                System.out.println((Object)("C after second delay: " + answer));
+                return answer;
+            }
+        }
+        throw new IllegalStateException("call to 'resume' before 'invoke' with coroutine");
+    }
+
+    public static final void main(@NotNull String[] args) {
+        Intrinsics.checkNotNullParameter((Object)args, (String)"args");
+        BuildersKt.runBlocking$default(null, (Function2)((Function2)new Function2<CoroutineScope, Continuation<? super Unit>, Object>(args, null){
+            long J$0;
+            int label;
+            private /* synthetic */ Object L$0;
+            final /* synthetic */ String[] $args;
+            {
+                this.$args = $args;
+                super(2, $completion);
+            }
+
+            /*
+             * Unable to fully structure code
+             */
+            public final Object invokeSuspend(Object $result) {
+                var2_2 = (CoroutineScope)this.L$0;
+                var6_3 = IntrinsicsKt.getCOROUTINE_SUSPENDED();
+                switch (this.label) {
+                    case 0: {
+                        ResultKt.throwOnFailure((Object)$result);
+                        v0 = (String)ArraysKt.firstOrNull((Object[])this.$args);
+                        waitMillis = v0 != null ? Long.parseLong(v0) : 100L;
+                        BuildersKt.launch$default((CoroutineScope)$this$runBlocking, null, null, (Function2)((Function2)new Function2<CoroutineScope, Continuation<? super Unit>, Object>(null){
+                            int label;
+
+                            public final Object invokeSuspend(Object $result) {
+                                IntrinsicsKt.getCOROUTINE_SUSPENDED();
+                                switch (this.label) {
+                                    case 0: {
+                                        ResultKt.throwOnFailure((Object)$result);
+                                        System.out.println((Object)"OTHER child ran");
+                                        return Unit.INSTANCE;
+                                    }
+                                }
+                                throw new IllegalStateException("call to 'resume' before 'invoke' with coroutine");
+                            }
+
+                            public final Continuation<Unit> create(Object value, Continuation<?> $completion) {
+                                return (Continuation)new /* invalid duplicate definition of identical inner class */;
+                            }
+
+                            public final Object invoke(CoroutineScope p1, Continuation<? super Unit> p2) {
+                                return (this.create(p1, p2)).invokeSuspend(Unit.INSTANCE);
+                            }
+                        }), (int)3, null);
+                        System.out.println((Object)"CALL greeting");
+                        this.L$0 = SpillingKt.nullOutSpilledVariable((Object)$this$runBlocking);
+                        this.J$0 = waitMillis;
+                        this.label = 1;
+                        v1 = StateMachineDemoKt.greeting(7, waitMillis, (Continuation<? super String>)((Continuation)this));
+                        if (v1 == var6_3) {
+                            return var6_3;
+                        }
+                        ** GOTO lbl22
+                    }
+                    case 1: {
+                        waitMillis = this.J$0;
+                        ResultKt.throwOnFailure((Object)$result);
+                        v1 = $result;
+lbl22:
+                        // 2 sources
+
+                        answer = (String)v1;
+                        System.out.println((Object)("RETURN " + answer));
+                        return Unit.INSTANCE;
+                    }
+                }
+                throw new IllegalStateException("call to 'resume' before 'invoke' with coroutine");
+            }
+
+            public final Continuation<Unit> create(Object value, Continuation<?> $completion) {
+                var var3_3 = new /* invalid duplicate definition of identical inner class */;
+                var3_3.L$0 = value;
+                return (Continuation)var3_3;
+            }
+
+            public final Object invoke(CoroutineScope p1, Continuation<? super Unit> p2) {
+                return (this.create(p1, p2)).invokeSuspend(Unit.INSTANCE);
+            }
+        }), (int)1, null);
+    }
+}

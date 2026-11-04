@@ -1,0 +1,39 @@
+Compiled from "StateMachineDemo.kt"
+final class StateMachineDemoKt$greeting$1 extends kotlin.coroutines.jvm.internal.ContinuationImpl {
+  int I$0;
+
+  int I$1;
+
+  long J$0;
+
+  java.lang.Object L$0;
+
+  java.lang.Object result;
+
+  int label;
+
+  StateMachineDemoKt$greeting$1(kotlin.coroutines.Continuation<? super StateMachineDemoKt$greeting$1>);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokespecial #35                 // Method kotlin/coroutines/jvm/internal/ContinuationImpl."<init>":(Lkotlin/coroutines/Continuation;)V
+       5: return
+
+  public final java.lang.Object invokeSuspend(java.lang.Object);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #46                 // Field result:Ljava/lang/Object;
+       5: aload_0
+       6: aload_0
+       7: getfield      #49                 // Field label:I
+      10: ldc           #50                 // int -2147483648
+      12: ior
+      13: putfield      #49                 // Field label:I
+      16: iconst_0
+      17: lconst_0
+      18: aload_0
+      19: checkcast     #52                 // class kotlin/coroutines/Continuation
+      22: invokestatic  #56                 // Method StateMachineDemoKt.greeting:(IJLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+      25: areturn
+}

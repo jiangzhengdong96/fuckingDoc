@@ -1,0 +1,6 @@
+CALL greeting
+A before first delay: user-7
+B after first delay: user-7, score=17
+C after second delay: user-7:17
+RETURN user-7:17
+OTHER child ran

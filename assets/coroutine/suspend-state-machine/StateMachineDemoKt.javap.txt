@@ -1,0 +1,172 @@
+Compiled from "StateMachineDemo.kt"
+public final class StateMachineDemoKt {
+  public static final java.lang.Object greeting(int, long, kotlin.coroutines.Continuation<? super java.lang.String>);
+    Code:
+       0: aload_3
+       1: instanceof    #11                 // class StateMachineDemoKt$greeting$1
+       4: ifeq          39
+       7: aload_3
+       8: checkcast     #11                 // class StateMachineDemoKt$greeting$1
+      11: astore        8
+      13: aload         8
+      15: getfield      #15                 // Field StateMachineDemoKt$greeting$1.label:I
+      18: ldc           #16                 // int -2147483648
+      20: iand
+      21: ifeq          39
+      24: aload         8
+      26: dup
+      27: getfield      #15                 // Field StateMachineDemoKt$greeting$1.label:I
+      30: ldc           #16                 // int -2147483648
+      32: isub
+      33: putfield      #15                 // Field StateMachineDemoKt$greeting$1.label:I
+      36: goto          49
+      39: new           #11                 // class StateMachineDemoKt$greeting$1
+      42: dup
+      43: aload_3
+      44: invokespecial #20                 // Method StateMachineDemoKt$greeting$1."<init>":(Lkotlin/coroutines/Continuation;)V
+      47: astore        8
+      49: aload         8
+      51: getfield      #24                 // Field StateMachineDemoKt$greeting$1.result:Ljava/lang/Object;
+      54: astore        7
+      56: invokestatic  #30                 // Method kotlin/coroutines/intrinsics/IntrinsicsKt.getCOROUTINE_SUSPENDED:()Ljava/lang/Object;
+      59: astore        9
+      61: aload         8
+      63: getfield      #15                 // Field StateMachineDemoKt$greeting$1.label:I
+      66: tableswitch   { // 0 to 2
+
+                     0: 92
+
+                     1: 159
+
+                     2: 258
+               default: 323
+          }
+      92: aload         7
+      94: invokestatic  #36                 // Method kotlin/ResultKt.throwOnFailure:(Ljava/lang/Object;)V
+      97: iload_0
+      98: invokedynamic #48,  0             // InvokeDynamic #0:makeConcatWithConstants:(I)Ljava/lang/String;
+     103: astore        4
+     105: aload         4
+     107: invokedynamic #53,  0             // InvokeDynamic #1:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+     112: getstatic     #59                 // Field java/lang/System.out:Ljava/io/PrintStream;
+     115: swap
+     116: invokevirtual #64                 // Method java/io/PrintStream.println:(Ljava/lang/Object;)V
+     119: lload_1
+     120: aload         8
+     122: aload         8
+     124: aload         4
+     126: putfield      #67                 // Field StateMachineDemoKt$greeting$1.L$0:Ljava/lang/Object;
+     129: aload         8
+     131: iload_0
+     132: putfield      #70                 // Field StateMachineDemoKt$greeting$1.I$0:I
+     135: aload         8
+     137: lload_1
+     138: putfield      #74                 // Field StateMachineDemoKt$greeting$1.J$0:J
+     141: aload         8
+     143: iconst_1
+     144: putfield      #15                 // Field StateMachineDemoKt$greeting$1.label:I
+     147: invokestatic  #80                 // Method kotlinx/coroutines/DelayKt.delay:(JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+     150: dup
+     151: aload         9
+     153: if_acmpne     188
+     156: aload         9
+     158: areturn
+     159: aload         8
+     161: getfield      #74                 // Field StateMachineDemoKt$greeting$1.J$0:J
+     164: lstore_1
+     165: aload         8
+     167: getfield      #70                 // Field StateMachineDemoKt$greeting$1.I$0:I
+     170: istore_0
+     171: aload         8
+     173: getfield      #67                 // Field StateMachineDemoKt$greeting$1.L$0:Ljava/lang/Object;
+     176: checkcast     #82                 // class java/lang/String
+     179: astore        4
+     181: aload         7
+     183: invokestatic  #36                 // Method kotlin/ResultKt.throwOnFailure:(Ljava/lang/Object;)V
+     186: aload         7
+     188: pop
+     189: iload_0
+     190: bipush        10
+     192: iadd
+     193: istore        5
+     195: aload         4
+     197: iload         5
+     199: invokedynamic #87,  0             // InvokeDynamic #2:makeConcatWithConstants:(Ljava/lang/String;I)Ljava/lang/String;
+     204: getstatic     #59                 // Field java/lang/System.out:Ljava/io/PrintStream;
+     207: swap
+     208: invokevirtual #64                 // Method java/io/PrintStream.println:(Ljava/lang/Object;)V
+     211: lload_1
+     212: aload         8
+     214: aload         8
+     216: aload         4
+     218: putfield      #67                 // Field StateMachineDemoKt$greeting$1.L$0:Ljava/lang/Object;
+     221: aload         8
+     223: iload_0
+     224: putfield      #70                 // Field StateMachineDemoKt$greeting$1.I$0:I
+     227: aload         8
+     229: lload_1
+     230: putfield      #74                 // Field StateMachineDemoKt$greeting$1.J$0:J
+     233: aload         8
+     235: iload         5
+     237: putfield      #90                 // Field StateMachineDemoKt$greeting$1.I$1:I
+     240: aload         8
+     242: iconst_2
+     243: putfield      #15                 // Field StateMachineDemoKt$greeting$1.label:I
+     246: invokestatic  #80                 // Method kotlinx/coroutines/DelayKt.delay:(JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+     249: dup
+     250: aload         9
+     252: if_acmpne     294
+     255: aload         9
+     257: areturn
+     258: aload         8
+     260: getfield      #90                 // Field StateMachineDemoKt$greeting$1.I$1:I
+     263: istore        5
+     265: aload         8
+     267: getfield      #74                 // Field StateMachineDemoKt$greeting$1.J$0:J
+     270: lstore_1
+     271: aload         8
+     273: getfield      #70                 // Field StateMachineDemoKt$greeting$1.I$0:I
+     276: istore_0
+     277: aload         8
+     279: getfield      #67                 // Field StateMachineDemoKt$greeting$1.L$0:Ljava/lang/Object;
+     282: checkcast     #82                 // class java/lang/String
+     285: astore        4
+     287: aload         7
+     289: invokestatic  #36                 // Method kotlin/ResultKt.throwOnFailure:(Ljava/lang/Object;)V
+     292: aload         7
+     294: pop
+     295: aload         4
+     297: iload         5
+     299: invokedynamic #93,  0             // InvokeDynamic #3:makeConcatWithConstants:(Ljava/lang/String;I)Ljava/lang/String;
+     304: astore        6
+     306: aload         6
+     308: invokedynamic #96,  0             // InvokeDynamic #4:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+     313: getstatic     #59                 // Field java/lang/System.out:Ljava/io/PrintStream;
+     316: swap
+     317: invokevirtual #64                 // Method java/io/PrintStream.println:(Ljava/lang/Object;)V
+     320: aload         6
+     322: areturn
+     323: new           #98                 // class java/lang/IllegalStateException
+     326: dup
+     327: ldc           #100                // String call to \'resume\' before \'invoke\' with coroutine
+     329: invokespecial #103                // Method java/lang/IllegalStateException."<init>":(Ljava/lang/String;)V
+     332: athrow
+
+  public static final void main(java.lang.String[]);
+    Code:
+       0: aload_0
+       1: ldc           #119                // String args
+       3: invokestatic  #125                // Method kotlin/jvm/internal/Intrinsics.checkNotNullParameter:(Ljava/lang/Object;Ljava/lang/String;)V
+       6: aconst_null
+       7: new           #127                // class StateMachineDemoKt$main$1
+      10: dup
+      11: aload_0
+      12: aconst_null
+      13: invokespecial #130                // Method StateMachineDemoKt$main$1."<init>":([Ljava/lang/String;Lkotlin/coroutines/Continuation;)V
+      16: checkcast     #132                // class kotlin/jvm/functions/Function2
+      19: iconst_1
+      20: aconst_null
+      21: invokestatic  #138                // Method kotlinx/coroutines/BuildersKt.runBlocking$default:(Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Ljava/lang/Object;
+      24: pop
+      25: return
+}

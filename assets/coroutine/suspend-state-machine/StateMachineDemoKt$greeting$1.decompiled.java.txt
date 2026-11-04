@@ -1,0 +1,32 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+import kotlin.Metadata;
+import kotlin.coroutines.Continuation;
+import kotlin.coroutines.jvm.internal.ContinuationImpl;
+import kotlin.coroutines.jvm.internal.DebugMetadata;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+@DebugMetadata(f="StateMachineDemo.kt", l={6, 9}, i={0, 0, 0, 1, 1, 1, 1}, s={"L$0", "I$0", "J$0", "L$0", "I$0", "J$0", "I$1"}, n={"prefix", "id", "waitMillis", "prefix", "id", "waitMillis", "score"}, m="greeting", c="StateMachineDemoKt")
+@Metadata(mv={2, 2, 0}, k=3, xi=48)
+static final class StateMachineDemoKt.greeting.1
+extends ContinuationImpl {
+    int I$0;
+    int I$1;
+    long J$0;
+    Object L$0;
+    /* synthetic */ Object result;
+    int label;
+
+    StateMachineDemoKt.greeting.1(Continuation<? super StateMachineDemoKt.greeting.1> $completion) {
+        super($completion);
+    }
+
+    @Nullable
+    public final Object invokeSuspend(@NotNull Object $result) {
+        this.result = $result;
+        this.label |= Integer.MIN_VALUE;
+        return StateMachineDemoKt.greeting(0, 0L, (Continuation<? super String>)((Continuation)this));
+    }
+}
