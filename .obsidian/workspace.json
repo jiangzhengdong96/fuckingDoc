@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/coroutine/面试/Android协程面试题.md",
+                "file": "docs/coroutine/知识点梳理/挂起函数与状态机场景详解.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Android协程面试题"
+              "title": "挂起函数与状态机场景详解"
             }
           }
         ]
@@ -33,12 +33,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/coroutine/知识点梳理/挂起函数与状态机场景详解.md",
+                "file": "docs/coroutine/知识点梳理/小计.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "挂起函数与状态机场景详解"
+              "title": "小计"
             }
           }
         ]
@@ -178,7 +178,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "docs/coroutine/知识点梳理/挂起函数与状态机场景详解.md",
+                "file": "docs/coroutine/知识点梳理/小计.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -207,6 +207,10 @@
   },
   "active": "228c09f248657c90",
   "lastOpenFiles": [
+    "docs/coroutine/知识点梳理/协程作用域与常用方法.md",
+    "docs/coroutine/知识点梳理/Android协程.md",
+    "docs/coroutine/知识点梳理/挂起函数与状态机场景详解.md",
+    "docs/coroutine/面试/Android协程面试题.md",
     "docs/coroutine/知识点梳理/挂起与恢复源码逐步分析.md",
     "assets/coroutine/suspend-state-machine/StateMachineDemoKt$greeting$1.decompiled.java.txt",
     "assets/coroutine/suspend-state-machine/StateMachineDemoKt.decompiled.java.txt",
@@ -220,10 +224,6 @@
     "assets/coroutine",
     "docs/coroutine/知识点梳理/协程核心对象和底层实现.md",
     "docs/coroutine/知识点梳理/README.md",
-    "docs/coroutine/知识点梳理/挂起函数与状态机场景详解.md",
-    "docs/coroutine/面试/Android协程面试题.md",
-    "docs/coroutine/知识点梳理/协程作用域与常用方法.md",
-    "docs/coroutine/知识点梳理/Android协程.md",
     "docs/coroutine/知识点梳理/协程和传统方案对比.md",
     "docs/coroutine/知识点梳理/协程并发控制与共享状态.md",
     "docs/coroutine/知识点梳理/Flow冷流热流与操作符.md",
