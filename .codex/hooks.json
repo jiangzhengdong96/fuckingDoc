@@ -6,8 +6,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$(git rev-parse --show-toplevel)/.codex/hooks/knowledge-stop-check.ps1\"",
-            "commandWindows": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\jiang\\Desktop\\fuckingDoc\\.codex\\hooks\\knowledge-stop-check.ps1\"",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File .codex/hooks/knowledge-stop-check.ps1",
+            "commandWindows": "powershell -NoProfile -ExecutionPolicy Bypass -File .codex/hooks/knowledge-stop-check.ps1",
             "timeout": 120,
             "statusMessage": "Checking knowledge repository"
           }

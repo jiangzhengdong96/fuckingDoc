@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 
 function Write-HookMessage {
     param([string]$Message)
@@ -28,15 +28,18 @@ $previousErrorActionPreference = $ErrorActionPreference
 $ErrorActionPreference = 'Continue'
 $changedFiles = @(git -C $repoRoot diff --name-only --diff-filter=ACMRTD HEAD 2>$null)
 $gitExitCode = $LASTEXITCODE
+$untrackedFiles = @(git -C $repoRoot ls-files --others --exclude-standard 2>$null)
+$untrackedExitCode = $LASTEXITCODE
+$changedFiles = @($changedFiles + $untrackedFiles | Sort-Object -Unique)
 $ErrorActionPreference = $previousErrorActionPreference
 
-if ($gitExitCode -ne 0) {
+if ($gitExitCode -ne 0 -or $untrackedExitCode -ne 0) {
     Write-HookMessage 'Knowledge hook skipped: unable to read git changes.'
     exit 0
 }
 
 $knowledgeFiles = $changedFiles | Where-Object {
-    $_ -match '^(docs/|templates/|AGENT\.md$|CONTRIBUTING\.md$|\.agents/skills/)'
+    $_ -match '^(docs/|templates/|scripts/|AGENTS\.md$|CONTRIBUTING\.md$|\.agents/|\.codex/hooks)'
 }
 
 if (-not $knowledgeFiles -or $knowledgeFiles.Count -eq 0) {

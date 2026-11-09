@@ -1,57 +1,20 @@
 ---
 name: knowledge-check
-description: Use this skill when checking, validating, or cleaning this Markdown knowledge repository. Trigger on requests like 检查文档, 检查链接, 检查锚点, 更新索引, 查重, 检查 README 导航, 修复本地 Markdown 链接, validate notes, or run repository quality checks.
+description: 检查知识库目录、链接、锚点、索引或修改文档后的结构验证时使用；事实正确性由 knowledge-review 处理。
 ---
 
-# Knowledge Check
+# 知识库结构检查
 
-This skill verifies repository health after note maintenance.
+1. 检查工作区差异，识别本次修改及用户已有编辑。
+2. 文档更新后运行：
+   ```powershell
+   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update-index.ps1
+   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-knowledge.ps1
+   ```
+3. 修改校验脚本时另运行 `python -m unittest discover -s scripts/tests`。检查 `git diff --check`。
+4. 查看生成差异；修复本次引入的问题，既有无关问题单独报告。不要用整体还原覆盖用户修改。
+5. 按 `.agents/references/workflow-acceptance.md` 核对规则变更后的典型请求行为。
 
-## First Steps
+检查覆盖文件结构、Markdown 行内/引用式链接、文件及显式锚点存在性和重复锚点；忽略代码块里的示例链接。外部 URL 可访问性、技术结论和运行行为不由结构脚本证明。
 
-1. Work from the repository root.
-2. Read `AGENT.md` and `docs/knowledge-rules.md`.
-3. Check the relevant module before making fixes.
-4. Keep fixes scoped to the current task.
-
-## Standard Commands
-
-Refresh generated navigation after adding, moving, or deleting notes:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\update-index.ps1
-```
-
-Run repository validation before finishing:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-knowledge.ps1
-```
-
-## Manual Checks
-
-When script output is not enough, inspect:
-
-- Broken local Markdown links.
-- Cross-file links with `#` fragments.
-- Missing explicit HTML anchors before linked headings.
-- Module `README.md` navigation drift.
-- Duplicate notes with similar title, slug, or nearby keywords.
-- Notes that cover too many independent topics and should be split.
-
-## Fix Rules
-
-- Prefer fixing the script or the source Markdown rather than manually editing
-  generated navigation.
-- Do not rewrite unrelated note content.
-- If validation failures come from existing unrelated work, report them clearly.
-- If a note should be split, propose the split first unless the user asked for a
-  full reorganization.
-
-## Completion
-
-Final responses should mention:
-
-- Which checks were run.
-- Which files were changed.
-- Whether remaining failures are related or unrelated.
+完成条件：检查成功，或明确列出剩余问题及其归属；报告不夸大验证范围。

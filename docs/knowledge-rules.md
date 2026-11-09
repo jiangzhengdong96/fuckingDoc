@@ -3,178 +3,61 @@
 <!-- page-toc:start -->
 **目录**
 
-- [目标](#section-目标)
-- [目录分层](#section-目录分层)
-- [命名规则](#section-命名规则)
-- [笔记类型和模板](#section-笔记类型和模板)
-- [导航锚点规则](#section-导航锚点规则)
-- [创建笔记流程](#section-创建笔记流程)
-- [自动索引规则](#section-自动索引规则)
-- [AI 生成内容规则](#section-ai-生成内容规则)
-- [拆分规则](#section-拆分规则)
+- [项目与操作范围](#section-项目与操作范围)
+- [文件归属与复用](#section-文件归属与复用)
+- [模板与内容深度](#section-模板与内容深度)
+- [导航与命名](#section-导航与命名)
+- [证据与纠错](#section-证据与纠错)
+- [面试与学习记录](#section-面试与学习记录)
+- [验证与职责](#section-验证与职责)
 <!-- page-toc:end -->
 
 
-<a id="section-目标"></a>
-###### 目标
+<a id="section-项目与操作范围"></a>
+###### 项目与操作范围
 
-这个仓库用于记录 Android 开发工程师的长期技术积累。内容要方便检索、持续补充和复盘，不追求一次写满。
+以 Android 为主，也接纳其他技术和兴趣主题。正文使用中文，保留必要的原始术语。普通问答留在对话；用户要求生成、记录、补充、纠正时修改文档。明确要求空模板时仅建骨架，已要求生成内容时不重复询问授权。
 
-<a id="section-目录分层"></a>
-###### 目录分层
+<a id="section-文件归属与复用"></a>
+###### 文件归属与复用
 
-- `docs/<module>/README.md`：模块说明、导航、学习重点、待整理。
-- `docs/<module>/<note>.md`：具体知识点笔记。
-- `docs/<module>/<topic>/README.md`：内容较大的专题目录导航。
-- `docs/learning-records/`：个人学习记录。
-- `templates/`：笔记模板。
-- `scripts/`：创建笔记和更新索引的脚本。
+先搜索标题、术语和关联链接，优先更新同主题的原章节。知识正文是详细解释的主要位置，面试笔记保留简答和追问并链接原文。源码细节可作为同主题章节，不因内容变长、超过某个章节数或持续追加而自动另建文件。
 
-<a id="section-命名规则"></a>
-###### 命名规则
+只有可独立学习的主题才考虑拆分；修改既有组织方式前说明方案。沿用 `docs/<module>/` 的实际结构，不为新兴趣强行套用 Android 场景。新模块需有 README，包含模块说明、导航、学习重点、待整理。
 
-- 目录名优先使用英文小写加短横线，例如 `android-framework/`。
-- 笔记文件名允许中文或英文，多个词之间用短横线，例如 `java基础.md`、`java基础-总结.md`、`activity-lifecycle.md`。
-- 标题使用中文。普通笔记和模块 `README.md` 都使用较小标题层级，例如 `### Activity 生命周期`。
-- 图片和截图放到 `assets/`，按模块继续建子目录。
+<a id="section-模板与内容深度"></a>
+###### 模板与内容深度
 
-<a id="section-笔记类型和模板"></a>
-###### 笔记类型和模板
+新笔记优先使用 `scripts/new-note.ps1`：topic、source-reading、troubleshooting、interview、learning-record 对应 `templates/` 中的模板。模板是起点，按问题删减占位内容，不要求每篇填满所有栏目。
 
-| 类型    | 参数值               | 模板                                      |
-| ----- | ----------------- | --------------------------------------- |
-| 普通知识点 | `topic`           | `templates/topic-template.md`           |
-| 问题排查  | `troubleshooting` | `templates/troubleshooting-template.md` |
-| 源码阅读  | `source-reading`  | `templates/source-reading-template.md`  |
-| 面试知识点 | `interview`       | `templates/interview-template.md`       |
-| 学习记录  | `learning-record` | `templates/learning-record-template.md` |
+知识点通常按“解决什么问题 → 最小例子 → 执行流程 → 适用条件与误区”组织。深入源码先用贯穿全文的例子和伪代码，再展示少量关键源码。区分真实源码、等价简化和教学伪代码；真实源码标明版本和来源，预期输出与实测结果分开写。
 
-<a id="section-导航锚点规则"></a>
-###### 导航锚点规则
+<a id="section-导航与命名"></a>
+###### 导航与命名
 
-所有阅读文档在标题下方保留可点击的页内目录，由 `scripts/update-toc.py` 自动生成（需要 Python 3）。新增或修改章节后运行 `scripts/update-index.ps1`，它会同时刷新页内目录；也可单独运行 `python scripts/update-toc.py`。生成区域用 `page-toc:start/end` 注释标识，不手工编辑。已有锚点保持不变，同名章节使用不同锚点，代码块内的示例标题不进入目录。
+文档标题通常使用三级标题，小节沿用现有风格。所有阅读笔记保留自动页内目录，统一由 `scripts/update-toc.py` 生成。不要额外维护一套手工页内目录。
 
-所有文件内导航和带 `#` 的跨文件跳转，都要使用显式 HTML anchor，不依赖 Markdown 渲染器自动生成标题锚点。
+跳转目标使用明确的 HTML anchor，例如 `<a id="example"></a>`。保留已有锚点，新增锚点在文件内唯一；跨文件链接检查目标文件和 fragment。移动文件时更新引用。
 
-原因是中文标题、空格、斜杠、点号、括号、问号等字符在不同工具里的自动锚点规则不完全一致，容易出现点击目录无法跳转的问题。
+文件名使用可读的中文或英文，可用连字符或点分隔。图片和源码材料放在 `assets/<module>/`。引用外部项目代码时说明来源与许可证，保留必要署名。
 
-推荐格式：
+<a id="section-证据与纠错"></a>
+###### 证据与纠错
 
-```markdown
-- [知识点1](#知识点1)
+需要核实的 API、版本行为、源码和性能结论优先查官方资料；项目实践可查 GitHub。具体检索、MCP 与引用规范见 [资料检索规范](../.agents/references/research.md)。无法核实的点明确列为待验证，不补造引用或实验结果。
 
-<a id="知识点1"></a>
-###### 知识点1
-```
+纠错要修订原来的错误表述，再搜索同一结论的其他出现位置，检查相关摘要、代码和面试答案。保留无关原文；仍有争议时说明证据范围，不替用户臆造项目条件。
 
-面试题同样适用：
+<a id="section-面试与学习记录"></a>
+###### 面试与学习记录
 
-```markdown
-- [面试题1](#面试题1)
+技术主题新增或纠正适合面试的结论时，同步已有对应面试题，采用简答版、深入追问和关联知识点。纯格式修改不扩展题目；非面试主题不强制生成面试题。缺少对应笔记时按请求范围判断：明确要求面试维护可新建，否则在原文保留问法并说明。
 
-<a id="面试题1"></a>
-###### 面试题1
-```
+只有用户要求时才创建学习记录或修改 `docs/roadmap.md` 的进度。生成内容、阅读源码和用户说“明白了”都不自动标记已掌握。
 
-如果是跨文件链接，例如链接目标是：
+<a id="section-验证与职责"></a>
+###### 验证与职责
 
-```markdown
-../面试/集合面试题.md#hashmap-底层结构
-```
+文档修改后执行 `scripts/update-index.ps1` 更新索引和页内目录，再执行 `scripts/check-knowledge.ps1`。检查生成差异，保留无关用户编辑。脚本变化另运行相关回归测试。
 
-目标文件中必须存在：
-
-```markdown
-<a id="hashmap-底层结构"></a>
-###### HashMap 底层结构
-```
-
-<a id="section-创建笔记流程"></a>
-###### 创建笔记流程
-
-优先使用脚本创建笔记：
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new-note.ps1 -Module kotlin -Title "协程异常处理" -Slug coroutine-exception -Type topic
-```
-
-创建问题排查记录：
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new-note.ps1 -Module troubleshooting -Title "Gradle 依赖冲突排查" -Slug gradle-dependency-conflict -Type troubleshooting
-```
-
-创建源码阅读记录：
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new-note.ps1 -Module source-reading -Title "OkHttp 责任链源码阅读" -Slug okhttp-interceptor-chain -Type source-reading
-```
-
-创建面试知识点：
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new-note.ps1 -Module interview -Title "HashMap 高频面试点" -Slug hashmap-interview -Type interview
-```
-
-创建学习记录：
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new-note.ps1 -Module learning-records -Title "协程学习记录" -Slug coroutine-learning -Type learning-record
-```
-
-<a id="section-自动索引规则"></a>
-###### 自动索引规则
-
-新增、移动、删除笔记后运行：
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\update-index.ps1
-```
-
-脚本会：
-
-- 更新有实际子笔记的模块 `README.md` 的 `导航` 区域，并保留当前标题层级。
-- 更新 `docs/index.md` 的模块表。
-- 不修改正文内容。
-
-<a id="section-ai-生成内容规则"></a>
-###### AI 生成内容规则
-
-当只需要创建 Markdown 文件时，先使用模板生成空骨架。
-
-当用户希望生成相关知识点内容时，需要先确认用户同意。用户同意后再补充正文，生成时遵守：
-
-- 不编造项目事实。
-- 不确定的内容标记为待验证。
-- 技术结论尽量写清适用条件。
-- 面试内容区分“简答版”和“深入追问”。
-
-更新知识点笔记时，需要同步扫描同模块下是否存在对应面试题文件。例如：
-
-```text
-docs/java/知识点梳理/集合.md -> docs/java/面试/集合面试题.md
-```
-
-- 如果知识点新增了适合面试复盘的内容，同步更新知识点内的 `面试可能怎么问` 和对应面试题文件。
-- 如果对应面试题文件不存在，但该知识点明显适合面试复盘，根据本次任务范围决定创建或提示待补。
-- 如果用户明确要求只改格式、只改错别字或不要更新面试内容，则不强行扩展面试题。
-
-<a id="section-拆分规则"></a>
-###### 拆分规则
-
-一个 Markdown 文件只记录一个相对明确的知识点。出现下面情况时优先拆分：
-
-- 同一文件开始覆盖多个独立主题。
-- 代码、问题、面试、源码分析混在一起。
-- 导航目录超过 8 个大章节。
-- 后续内容需要持续追加。
-
-拆分后用专题目录承载，例如：
-
-```text
-docs/coroutine/
-  README.md
-  coroutine-basic.md
-  coroutine-exception.md
-  flow-basic.md
-```
+脚本检查结构、链接与锚点；内容核实由 knowledge-review 负责；教学可理解性由 knowledge-teach 负责。完成报告说明改了什么、检查结果和未验证事项。

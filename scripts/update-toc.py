@@ -91,7 +91,7 @@ def update(text, name):
 
 
 def main():
-    paths = sorted([*ROOT.glob('*.md'), *(ROOT / 'docs').rglob('*.md'),
+    paths = sorted([*(p for p in ROOT.glob('*.md') if p.name not in ('AGENTS.md', 'CLAUDE.md')), *(ROOT / 'docs').rglob('*.md'),
                     *(ROOT / 'templates').glob('*.md'), *(ROOT / 'assets').glob('*.md')])
     changed = 0
     for path in paths:
@@ -99,7 +99,7 @@ def main():
         bom = raw.startswith(b'\xef\xbb\xbf')
         original = raw.decode('utf-8-sig').replace('\r\n', '\n')
         updated = update(original, path.stem)
-        if updated != original:
+        if updated.rstrip('\n') != original.rstrip('\n'):
             newline = '\r\n' if b'\r\n' in raw else '\n'
             path.write_bytes((b'\xef\xbb\xbf' if bom else b'') + updated.replace('\n', newline).encode('utf-8'))
             changed += 1

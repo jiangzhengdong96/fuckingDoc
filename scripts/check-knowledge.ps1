@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 
 function ConvertFrom-CodePoint {
     param([int[]]$CodePoints)
@@ -63,23 +63,7 @@ Get-ChildItem -LiteralPath $docsDir -Recurse -File -Filter '*.md' | ForEach-Obje
         Add-Issue -Issues $issues -Message "Markdown file has no Markdown heading: $currentFile"
     }
 
-    $dir = $_.DirectoryName
-    [regex]::Matches($content, '\[[^\]]+\]\(([^)]+)\)') | ForEach-Object {
-        $target = $_.Groups[1].Value
-        if ($target -match '^(https?://|mailto:|#)') {
-            return
-        }
 
-        $path = ($target -split '#')[0]
-        if ([string]::IsNullOrWhiteSpace($path)) {
-            return
-        }
-
-        $resolved = Join-Path $dir $path
-        if (-not (Test-Path -LiteralPath $resolved)) {
-            Add-Issue -Issues $issues -Message "Broken local markdown link: $($_.Value) in $currentFile"
-        }
-    }
 }
 
 if ($issues.Count -gt 0) {
@@ -87,4 +71,6 @@ if ($issues.Count -gt 0) {
     exit 1
 }
 
+& python (Join-Path $PSScriptRoot 'check-links.py')
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 Write-Output 'Knowledge base check passed.'
