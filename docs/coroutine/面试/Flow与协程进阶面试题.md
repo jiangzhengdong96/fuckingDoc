@@ -49,6 +49,8 @@
 - [label 与 CancellableContinuation 的决策状态有什么区别？](#source-two-states)
 - [invokeSuspend 为什么带着 0 参数重新调用函数却不会从头执行？](#source-label-high-bit)
 - [第一次恢复又挂起、第二次恢复返回结果，BaseContinuationImpl 分别怎么处理？](#source-base-loop)
+- [文件复制案例中，调用链如何挂起并逐层交付结果？](#copy-state-machine-flow)
+- [挂起 lambda 的 create、invoke、invokeSuspend 有什么区别，为什么初始 completion 可以是 null？](#suspend-lambda-entry-methods)
 <!-- page-toc:end -->
 
 
@@ -466,3 +468,21 @@
 **深入追问：** completion 也是 BaseContinuationImpl 时，标准库通过循环推进上一层而不是简单递归。这样第一次 delay 只推进到第二次等待，第二次等待结束后才把完整字符串交给 main。
 
 **关联知识点：** [挂起函数与状态机场景详解：源码分析](../知识点梳理/挂起函数与状态机场景详解.md#标准库恢复循环)
+
+<a id="copy-state-machine-flow"></a>
+###### 文件复制案例中，调用链如何挂起并逐层交付结果？
+
+**简答版：** 外层代码块等待复制函数，复制函数等待 withContext(IO) 的工作。真正挂起时，生成代码保存恢复位置并逐层返回挂起标记；IO 完成后，withContext 按原上下文安排恢复，结果沿完成链交给外层，最后才打印。
+
+**深入追问：** File.copyTo 是阻塞 IO，会占用工作线程；runBlocking 仍阻塞调用线程等待整体结束。教学中每层状态机各有自己的 label，但直接返回挂起调用结果的函数可能被尾调用优化，不保证每层都生成独立状态机。
+
+**关联知识点：** [文件复制的往返流程](../知识点梳理/挂起函数与状态机场景详解.md#文件复制往返流程)
+
+<a id="suspend-lambda-entry-methods"></a>
+###### 挂起 lambda 的 create、invoke、invokeSuspend 有什么区别，为什么初始 completion 可以是 null？
+
+**简答版：** 常见 JVM 生成形式中，create 为本次调用创建执行实例并接上 completion；invoke 是函数对象调用入口；invokeSuspend 执行状态机主体。初始代码块对象可先不接 completion，启动时再创建连接完成通知链的执行实例。
+
+**深入追问：** 实际启动不一定经过 invoke；恢复通常通过运行库再次进入原实例的 invokeSuspend，不会每次创建 label = 0 的新实例。Function2 对应作用域接收者与 Continuation 两个参数；生成类可同时继承 SuspendLambda、实现 Function2。初始 null 不代表 runBlocking 执行时没有接收完成结果的协程对象，创建实例也不等于新增内部类定义。
+
+**关联知识点：** [挂起 lambda 的执行入口](../知识点梳理/挂起函数与状态机场景详解.md#文件复制lambda入口)
