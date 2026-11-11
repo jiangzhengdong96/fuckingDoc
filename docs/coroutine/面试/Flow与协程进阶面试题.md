@@ -53,6 +53,7 @@
 - [挂起 lambda 的 create、invoke、invokeSuspend 有什么区别，为什么初始 completion 可以是 null？](#suspend-lambda-entry-methods)
 - [嵌套挂起时每层都有续体吗，label、result、completion 如何配合？](#nested-continuation-chain)
 - [续体与 callback 有什么联系，协程替开发者管理了什么？](#continuation-vs-callback)
+- [状态机的 switch 与恢复运行库的 while 是一回事吗？](#state-switch-vs-resume-loop)
 <!-- page-toc:end -->
 
 
@@ -508,3 +509,12 @@
 **进一步追问：** 不同 lambda 通常表示不同后续步骤，状态机以同一执行对象中的不同 label 表示这些步骤；捕获变量对应保存字段。invokeSuspend 可类比回调主体，但这不是 lambda 到续体的一对一替换，手写回调也能使用状态机。核心收益是编译器自动管理后续执行位置与跨挂起点状态，使异步流程保持顺序写法。
 
 **关联知识点：** [续体与 callback 的同例对照](../知识点梳理/挂起函数与状态机场景详解.md#续体与callback)
+
+<a id="state-switch-vs-resume-loop"></a>
+###### 状态机的 switch 与恢复运行库的 while 是一回事吗？
+
+**简答版：** 不是。业务状态机按 label 跳到恢复位置；真正挂起时 return，恢复时重新进入。Java 风格的 switch 在立即完成路径可贯穿后续 case，或跳出到公共结尾，不需要额外 while 来模拟。BaseContinuationImpl.resumeWith 的 while 则在本层完成后沿 completion 推进调用方续体。
+
+**深入追问：** 更新 label 不会让当前 switch 自动重新匹配；Kotlin when 也没有 Java switch 的贯穿语义。字节码与反编译展示受版本、优化和工具影响，不能把 switch 文本当作统一生成规范。运行库循环遇到再次挂起就退出，不会忙等结果。
+
+**关联知识点：** [状态机分支](../知识点梳理/挂起函数与状态机场景详解.md#顺序挂起例子)、[恢复循环](../知识点梳理/挂起函数与状态机场景详解.md#恢复桥接)
