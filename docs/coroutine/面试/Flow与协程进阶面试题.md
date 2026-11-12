@@ -54,6 +54,7 @@
 - [嵌套挂起时每层都有续体吗，label、result、completion 如何配合？](#nested-continuation-chain)
 - [续体与 callback 有什么联系，协程替开发者管理了什么？](#continuation-vs-callback)
 - [状态机的 switch 与恢复运行库的 while 是一回事吗？](#state-switch-vs-resume-loop)
+- [等待完成后谁调用 resumeWith，如何重新进入原对象并推进上层？](#continuation-wiring-resume)
 <!-- page-toc:end -->
 
 
@@ -518,3 +519,12 @@
 **深入追问：** 更新 label 不会让当前 switch 自动重新匹配；Kotlin when 也没有 Java switch 的贯穿语义。字节码与反编译展示受版本、优化和工具影响，不能把 switch 文本当作统一生成规范。运行库循环遇到再次挂起就退出，不会忙等结果。
 
 **关联知识点：** [状态机分支](../知识点梳理/挂起函数与状态机场景详解.md#顺序挂起例子)、[恢复循环](../知识点梳理/挂起函数与状态机场景详解.md#恢复桥接)
+
+<a id="continuation-wiring-resume"></a>
+###### 等待完成后谁调用 resumeWith，如何重新进入原对象并推进上层？
+
+**简答版：** 子续体构造时通过 completion 保存调用方续体，通常不是把子续体加入父续体列表。等待机制保存恢复所需引用，结果就绪后经调度、包装续体等路径恢复原实例；resumeWith 调用 invokeSuspend，由保存的 label 进入后续代码。
+
+**深入追问：** 本层返回挂起标记就退出；完成时将结果交给 completion。调用方也是 BaseContinuationImpl 时，运行库循环切换 current 和 result，直接推进调用方的 invokeSuspend；最终通知 runBlocking 的完成接收对象。首次向下调用和挂起后的恢复路径不同，不应每层都再 new 或重复通知。completion 链不同于 Job 子任务管理。
+
+**关联知识点：** [续体构造、等待回调与逐层恢复连线](../知识点梳理/挂起函数与状态机场景详解.md#恢复桥接)
