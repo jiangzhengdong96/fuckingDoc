@@ -6,6 +6,7 @@
       {
         "id": "8467b919a68d6b0e",
         "type": "tabs",
+        "dimension": 14.771048744460858,
         "children": [
           {
             "id": "140007385d467816",
@@ -26,6 +27,7 @@
       {
         "id": "0f7cae3e564423c1",
         "type": "tabs",
+        "dimension": 85.22895125553914,
         "children": [
           {
             "id": "228c09f248657c90",
@@ -33,12 +35,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/coroutine/知识点梳理/协程和传统方案对比.md",
-                "mode": "source",
+                "file": "docs/coroutine/知识点梳理/挂起函数与状态机场景详解.md",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "协程和传统方案对比"
+              "title": "挂起函数与状态机场景详解"
             }
           }
         ]
@@ -178,7 +180,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "docs/coroutine/知识点梳理/协程和传统方案对比.md",
+                "file": "docs/coroutine/知识点梳理/挂起函数与状态机场景详解.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -207,6 +209,12 @@
   },
   "active": "228c09f248657c90",
   "lastOpenFiles": [
+    "docs/coroutine/知识点梳理/协程并发控制与共享状态.md",
+    "docs/coroutine/知识点梳理/协程和传统方案对比.md",
+    "docs/coroutine/知识点梳理/协程核心对象和底层实现.md",
+    "docs/coroutine/知识点梳理/协程作用域与常用方法.md",
+    "docs/coroutine/知识点梳理/StateFlow状态更新细节.md",
+    "docs/coroutine/知识点梳理/Flow冷流热流与操作符.md",
     "scripts/tests/__pycache__/test_knowledge_hook.cpython-312.pyc",
     "scripts/tests/test_knowledge_hook.py",
     "scripts/__pycache__/check-links.cpython-312.pyc",
@@ -217,23 +225,16 @@
     "scripts/check-links.py",
     "AGENTS.md",
     "docs/coroutine/知识点梳理/小计.md",
-    "docs/coroutine/知识点梳理/协程作用域与常用方法.md",
     "docs/coroutine/知识点梳理/Android协程.md",
     "docs/coroutine/知识点梳理/挂起函数与状态机场景详解.md",
     "docs/coroutine/面试/Android协程面试题.md",
     "docs/coroutine/知识点梳理/挂起与恢复源码逐步分析.md",
     "assets/coroutine/suspend-state-machine/StateMachineDemoKt$greeting$1.decompiled.java.txt",
     "assets/coroutine/suspend-state-machine/StateMachineDemoKt.decompiled.java.txt",
-    "assets/coroutine/suspend-state-machine/output-0.txt",
-    "docs/coroutine/知识点梳理/协程核心对象和底层实现.md",
     "docs/coroutine/知识点梳理/README.md",
-    "docs/coroutine/知识点梳理/协程和传统方案对比.md",
-    "docs/coroutine/知识点梳理/协程并发控制与共享状态.md",
-    "docs/coroutine/知识点梳理/Flow冷流热流与操作符.md",
     "docs/coroutine/知识点梳理/协程取消与超时.md",
     "docs/coroutine/coroutine总结.md",
     "docs/coroutine/README.md",
-    "docs/coroutine/知识点梳理/StateFlow状态更新细节.md",
     "docs/coroutine/面试/Flow与协程进阶面试题.md",
     "docs/coroutine/知识点梳理/Android协程工程规范.md",
     "docs/coroutine/面试/README.md",
