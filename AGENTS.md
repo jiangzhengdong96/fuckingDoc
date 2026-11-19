@@ -18,6 +18,7 @@
 - 核实结论、检查内容、纠错或查询 GitHub 实践：`.agents/skills/knowledge-review/SKILL.md`。
 - 面试题维护：`.agents/skills/interview-note-manage/SKILL.md`。
 - 目录、链接、索引与检查脚本：`.agents/skills/knowledge-check/SKILL.md`。
+- 网页正文提取、Obsidian 反向链接查询、笔记移动或显示检查：读取 `.agents/references/knowledge-tools.md`，按需使用 defuddle 或 obsidian-cli。
 - 用户要求复盘工作流，或当前会话反复出现重复建文档、漏同步、解释过深等问题：读取 `.agents/references/workflow-retro.md`。
 - 落盘前读取 `docs/knowledge-rules.md`；查询外部证据时读取 `.agents/references/research.md`。
 
