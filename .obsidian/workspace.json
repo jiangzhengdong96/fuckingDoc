@@ -6,7 +6,6 @@
       {
         "id": "8467b919a68d6b0e",
         "type": "tabs",
-        "dimension": 14.77104874446086,
         "children": [
           {
             "id": "140007385d467816",
@@ -14,33 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/coroutine/知识点梳理/挂起函数与状态机场景详解.md",
+                "file": "docs/jetpack/README.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "挂起函数与状态机场景详解"
-            }
-          }
-        ]
-      },
-      {
-        "id": "0f7cae3e564423c1",
-        "type": "tabs",
-        "dimension": 85.22895125553914,
-        "children": [
-          {
-            "id": "228c09f248657c90",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "docs/coroutine/知识点梳理/挂起函数与状态机场景详解.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "挂起函数与状态机场景详解"
+              "title": "README"
             }
           }
         ]
@@ -180,7 +158,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "docs/coroutine/知识点梳理/挂起函数与状态机场景详解.md",
+                "file": "docs/jetpack/README.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -207,11 +185,20 @@
       "bases:新建数据库": false
     }
   },
-  "active": "228c09f248657c90",
+  "active": "e08eaab49deca5a9",
   "lastOpenFiles": [
-    "docs/coroutine/知识点梳理/协程并发控制与共享状态.md",
-    "docs/coroutine/知识点梳理/小计.md",
+    "docs/java/README.md",
+    "docs/java/知识点梳理/String.md",
+    "docs/java/知识点梳理/java基础.md",
+    "docs/java/知识点梳理/Lambda-Stream-Optional.md",
+    "docs/java/知识点梳理/日期时间.md",
+    "docs/java/知识点梳理/泛型.md",
+    "docs/java/知识点梳理/集合.md",
+    "docs/java/知识点梳理/反射.md",
+    "docs/java/知识点梳理/序列化.md",
     "docs/coroutine/知识点梳理/挂起函数与状态机场景详解.md",
+    "docs/coroutine/知识点梳理/小计.md",
+    "docs/coroutine/知识点梳理/协程并发控制与共享状态.md",
     "docs/coroutine/知识点梳理/协程和传统方案对比.md",
     "docs/coroutine/知识点梳理/协程核心对象和底层实现.md",
     "docs/coroutine/知识点梳理/协程取消与超时.md",
@@ -236,8 +223,6 @@
     "docs/coroutine/知识点梳理/README.md",
     "docs/coroutine/coroutine总结.md",
     "docs/coroutine/README.md",
-    "docs/coroutine/知识点梳理/Android协程工程规范.md",
-    "docs/coroutine/面试/README.md",
     "Pasted image 20261008162316.png",
     "Pasted image 20261008162258.png",
     "Pasted image 20261008161837.png",
@@ -248,12 +233,6 @@
     "Pasted image 20260929170158.png",
     "Pasted image 20260929154852.png",
     "Pasted image 20260929114436.png",
-    "docs/android-tv/知识点梳理/TV发布和调试.md",
-    "docs/android-tv/知识点梳理/TV媒体播放.md",
-    "docs/android-tv/知识点梳理/TV焦点下发源码流程.md",
-    "docs/android-tv/知识点梳理/TV界面适配.md",
-    "docs/android-tv/知识点梳理/TV开发基础.md",
-    "docs/android-tv/知识点梳理/TV列表和焦点性能.md",
     "未命名.canvas"
   ]
 }
