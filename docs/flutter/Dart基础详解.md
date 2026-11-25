@@ -13,11 +13,14 @@
 - [控制流、枚举、Record 与模式匹配](#branches)
 - [类与构造：this、命名构造、factory、const](#classes)
 - [extends、implements、mixin 与依赖注入](#interfaces)
+- [sealed 状态建模：避免多个布尔值组合出无效状态](#sealed-state)
 - [泛型、扩展与相等性](#generics)
 - [异常处理：catch、finally、rethrow 与 assert](#errors)
 - [import、库边界与 JSON](#libraries)
 - [Future 与 async/await：从执行顺序理解异步](#future)
 - [串行、并发等待、异常与超时](#future-concurrency)
+- [异步循环：forEach 不等待，map 还可能没开始执行](#async-loops)
+- [await 期间状态会变化：旧请求不能覆盖新结果](#async-stale)
 - [事件循环与微任务：不是所有异步都开线程](#event-loop)
 - [Stream：多次事件、监听与释放](#stream)
 - [Isolate：CPU 工作为什么不能只加 async](#isolate)
@@ -166,6 +169,25 @@ final 限制变量绑定，const 还要求常量表达式与常量对象；const
 
 late 适用于初始化时机确实由程序保证的场景，不能用来消除所有空安全报错。将未知的数据写成 late，并不会让它自动准备好。资料：[变量、late、final 和 const](https://dart.dev/language/variables)。
 
+**常量对象可以被复用，但 const 构造函数不代表每次调用都是常量。** 以下例子区分“构造函数声明支持 const”和“调用处实际处于 const 上下文”：
+
+```dart
+class Point {
+  final int x;
+  const Point(this.x);
+}
+
+void main() {
+  const first = Point(1); // const 上下文中可省略右侧 const
+  const second = Point(1);
+  final third = Point(1); // 普通构造调用
+  print(identical(first, second)); // true，相同常量值被规范化
+  print(identical(first, third));  // false
+}
+```
+
+const 上下文也会作用于嵌套的常量表达式；final 声明本身不建立 const 上下文。不要用“实例字段全是 final”推导“实例必然是编译期常量”。
+
 <a id="null-safety"></a>
 ###### 空安全：可空、判空与强制断言
 
@@ -247,6 +269,24 @@ void main() {
 
 typedef 为函数类型等起别名，不会创建一个有独立运行时语义的新类。Flutter 常见 `VoidCallback` 可以理解为 `void Function()`；需要返回异步完成信号时通常使用 `Future<void> Function()`。不要把希望等待的异步回调声明成只表达同步通知的 void 回调后，又假设调用方会自动等待它。
 
+**参数传递不会自动复制对象。** 可以理解为传入引用值的一份副本：在函数内给参数重新赋值，不会改变调用方变量；通过参数修改同一个可变对象，则会被调用方观察到。
+
+```dart
+void edit(List<int> values) {
+  values.add(2); // 修改共同指向的列表
+  values = [9]; // 只改变局部参数指向
+  print(values); // [9]
+}
+
+void main() {
+  final original = <int>[1];
+  edit(original);
+  print(original); // [1, 2]，不是 [9]
+}
+```
+
+因此 final 参数来源也不保证被调用函数不能修改对象。需要隔离修改时，应按需求复制集合或使用不可变模型；浅复制只隔离外层容器。
+
 资料：[函数与参数](https://dart.dev/language/functions)。
 
 <a id="collections"></a>
@@ -292,6 +332,35 @@ void main() {
 `..` 是级联，连续操作同一个接收对象，并把该对象作为整段表达式的结果；sort 本身返回 void，所以不能把 sort 的返回值当成排好序的列表。级联不等于异步等待，也不改变调用顺序。
 
 `List.unmodifiable(items)` 限制通过返回列表修改结构，但不把元素对象深度冻结。`[...items]` 同样只是浅拷贝。List 默认 `==` 通常比较对象身份，不自动逐元素比较；Set/Map 的元素与键比较依赖正确的 `==` 和 hashCode 实现。正在遍历时修改集合结构可能抛并发修改错误，即使只在一个 isolate 中也可能发生。
+
+**用一次实际遍历理解“惰性”：** 创建 map 的结果时还没遍历；第一次 toList 生成一份结果；后面源列表变化，再遍历同一个 Iterable 会重新计算。
+
+```dart
+void main() {
+  final source = <int>[1, 2];
+  final mapped = source.map((value) {
+    print('map $value');
+    return value * 10;
+  });
+  print('created');
+  final snapshot = mapped.toList(); // 此时才打印 map 1、map 2
+  source.add(3);
+  print(snapshot);       // [10, 20]
+  print(mapped.toList()); // 再打印 map 1、2、3，得到 [10, 20, 30]
+}
+```
+
+还要区分以下集合边界：
+
+| 操作 | 边界 |
+|---|---|
+| first / last / single | 空集合读取会失败；single 还要求恰好一个元素 |
+| firstWhere(test) | 无匹配且未提供 orElse 时抛 StateError；非空元素类型的 orElse 不能随意返回 null |
+| List.filled(n, value) | 默认固定长度；若 value 是可变对象，各位置会引用同一个 value，不会复制 n 个对象 |
+| List.generate(n, builder) | 每个下标分别调用 builder，适合分别创建元素对象；结果是否可增长由 growable 决定 |
+| toList(growable: false) | 固定长度但通常仍可替换元素，不等于不可修改列表 |
+| map[key] | null 可能表示键不存在，也可能是该键存储了 null；需要区分时用 containsKey |
+| removeWhere / 新列表过滤 | 删除遍历中的元素时，比在 for-in 中直接 remove 更合适 |
 
 资料：[集合](https://dart.dev/language/collections)。
 
@@ -439,6 +508,82 @@ ArticleService 只依赖接口，通过构造函数拿到仓库；单元测试�
 - Dart 3 的 `interface class` 限制库外继承、允许库外实现；`final class` 限制库外继承和实现；`base` 与 `sealed` 另有继承限制。初学先理解 abstract interface class 和 sealed class 的用途，不能把 `final class` 误读成“实例字段自动不可变”。
 
 资料：[继承](https://dart.dev/language/extend)、[mixin](https://dart.dev/language/mixins)、[类修饰符](https://dart.dev/language/class-modifiers)。
+
+**把 super 和 getter/setter 连成一个例子：** super.name 把构造参数转发给父类，setter 用属性赋值语法调用，但内部仍可验证数据。
+
+```dart
+class Person {
+  final String name;
+  Person(this.name);
+  String describe() => name;
+}
+
+class Student extends Person {
+  int _score = 0;
+  Student(super.name);
+
+  int get score => _score;
+  set score(int value) {
+    if (value < 0 || value > 100) {
+      throw ArgumentError.value(value, 'score', 'Expected 0..100');
+    }
+    _score = value;
+  }
+
+  @override
+  String describe() => '${super.describe()}: $_score';
+}
+
+void main() {
+  final student = Student('Lin');
+  student.score = 90; // 调用 setter
+  print(student.score); // 调用 getter，90
+  print(student.describe()); // Lin: 90
+}
+```
+
+这里验证放在正常代码而非 assert 中，因此生产环境仍有效。getter/setter 不保证便宜或无副作用；设计 API 时应避免把很重的异步操作藏在看似普通的属性读取里。
+
+<a id="sealed-state"></a>
+###### sealed 状态建模：避免多个布尔值组合出无效状态
+
+加载中、成功、失败常各有不同数据。只写 isLoading、hasError、items，可能出现“正在加载又失败、错误文字为空”等难解释组合。sealed 可以明确允许的分支，并让 switch 检查是否覆盖所有情况。
+
+```dart
+sealed class LoadState {
+  const LoadState();
+}
+
+final class Loading extends LoadState {
+  const Loading();
+}
+
+final class Loaded extends LoadState {
+  final List<String> titles;
+  Loaded(List<String> titles) : titles = List.unmodifiable(titles);
+}
+
+final class Failed extends LoadState {
+  final String message;
+  const Failed(this.message);
+}
+
+String describeState(LoadState state) => switch (state) {
+  Loading() => 'loading',
+  Loaded(:final titles) => 'count=${titles.length}',
+  Failed(:final message) => 'error=$message',
+};
+
+void main() {
+  print(describeState(const Loading()));
+  print(describeState(Loaded(['Dart'])));
+  print(describeState(const Failed('offline')));
+}
+```
+
+sealed 本身隐含 abstract，直接子类型限制在同一库中；这里再把具体分支声明成 final。增加新直接分支时，没有兜底分支的 switch 表达式会提示遗漏。sealed 不自动深度冻结数据；Loaded 使用不可修改列表，是额外做出的数据约束。
+
+这只是一个简单状态模型，不代表所有页面都必须互斥地“只有加载、数据或错误”。保留旧数据的后台刷新可以另建包含旧数据和刷新状态的模型。enum 适合有限标签，sealed 分支适合每种情况带不同字段。
 
 <a id="generics"></a>
 ###### 泛型、扩展与相等性
@@ -620,6 +765,77 @@ Future<void> main() async {
 
 资料：[Future.wait](https://api.dart.dev/dart-async/Future/wait.html)、[Future.timeout](https://api.dart.dev/dart-async/Future/timeout.html)。
 
+<a id="async-loops"></a>
+###### 异步循环：forEach 不等待，map 还可能没开始执行
+
+Iterable.forEach 的回调类型是 void Function(T)，它逐个调用回调，却不收集回调返回的 Future。写成 `items.forEach((item) async { ... })`，不代表整个循环会等待所有异步工作；其外部也不能靠 await 一个 void 返回值解决问题。
+
+```dart
+Future<int> save(int id) async {
+  await Future<void>.delayed(Duration.zero);
+  print('saved $id');
+  return id;
+}
+
+Future<void> main() async {
+  final ids = [1, 2];
+  // 顺序执行，每次完成后再开始下一次。
+  for (final id in ids) {
+    await save(id);
+  }
+  print('serial done');
+
+  // map 先生成惰性 Iterable；Future.wait 遍历它时调用 save。
+  final results = await Future.wait(ids.map(save));
+  print('concurrent done: $results');
+}
+```
+
+只写 `final tasks = ids.map(save)` 而从未遍历，save 可能一次都没有调用。对这个 Iterable 重复遍历，又可能重复创建任务；需要保留同一批任务时，可先 toList 再交给 Future.wait。即使并发是正确选择，也不宜一次启动成千上万请求，需要按服务端和资源限制控制批量或并发量。
+
+资料：[Iterable.forEach 的签名与实现](https://api.dart.dev/dart-core/Iterable/forEach.html)、[Iterable.map 的惰性约定](https://api.dart.dev/dart-core/Iterable/map.html)。
+
+<a id="async-stale"></a>
+###### await 期间状态会变化：旧请求不能覆盖新结果
+
+同一 isolate 的同步回调不会同时执行，但 await 让出后，其他回调可以改变状态。搜索先输入 A 再输入 B，若 A 更晚完成，直接写回结果会让页面倒退。下面用请求编号丢弃过期结果；Completer 仅用于手动控制两次“请求”的完成顺序，不是真实网络实现。
+
+```dart
+import 'dart:async';
+
+class SearchModel {
+  int _requestId = 0;
+  String text = '';
+
+  Future<void> search(Future<String> response) async {
+    final requestId = ++_requestId;
+    final result = await response;
+    if (requestId != _requestId) return;
+    text = result;
+  }
+}
+
+Future<void> main() async {
+  final model = SearchModel();
+  final older = Completer<String>();
+  final newer = Completer<String>();
+  final first = model.search(older.future);
+  final second = model.search(newer.future);
+
+  newer.complete('new result');
+  await second;
+  older.complete('old result');
+  await first;
+  print(model.text); // new result
+}
+```
+
+Completer 暴露 future 给使用者，由生产者调用 complete 或 completeError 完成，一般用于适配回调式 API；一个 Completer 只能完成一次，不是多事件 Stream，也不提供自动取消。普通 async 函数能表达的流程无需额外套 Completer。
+
+请求编号只是“过期结果不再写回”，底层任务仍可能继续。生产代码还需处理失败、取消和对象生命周期；过期请求的错误也需有处理路径。Flutter 在 await 后操作 State 或 BuildContext 前应按对象检查 mounted；mounted 只能说明仍挂载，不能判断哪个请求最新。不要把检查 mounted 当成请求排序或取消机制。
+
+资料：[Completer](https://api.dart.dev/dart-async/Completer-class.html)、[BuildContext.mounted](https://api.flutter.dev/flutter/widgets/BuildContext/mounted.html)。
+
 <a id="event-loop"></a>
 ###### 事件循环与微任务：不是所有异步都开线程
 
@@ -795,12 +1011,17 @@ before 中第一篇文章仍然是未收藏，因为仓库替换的是元素引�
 | async 会把 CPU 计算放到后台吗？ | 不会，仍需区分事件排队与 isolate 并行 | [事件循环](#event-loop) |
 | Future.wait 中一个失败会取消其他任务吗？ | 不会自动取消；eagerError 也只影响何时报告错误 | [并发](#future-concurrency) |
 | Stream 是 StateFlow 吗？ | 不是，不能默认有当前值和历史重放 | [Stream](#stream) |
+| forEach 中 async 回调会被等完吗？ | 不会；用 for-in + await 串行，或 Future.wait 汇合并发任务 | [异步循环](#async-loops) |
+| 单 isolate 为什么还会旧请求覆盖新请求？ | await 期间其他逻辑可推进；结果返回顺序不一定等于发起顺序 | [过期结果](#async-stale) |
+| sealed 与 final class 有何区别？ | sealed 隐含抽象并支持已知分支的穷尽检查；final class 不自动让字段不可变 | [状态建模](#sealed-state) |
 
 <a id="sources"></a>
 ###### 资料与验证范围
 
 关键结论就近链接 Dart/Flutter 官方资料。2026-11-25 已读取变量、构造、异步、并发、模式和库文档；其他链接作为专题扩展入口。基础语法示例以本机 Dart 3.14.0 检查，未将新版本页面中的所有特性都用于本文。
 
-2026-11-25 已将正文的 18 个 dart 代码块分别提取到独立文件，全部通过 dart analyze 并运行成功；异步顺序、Stream 事件和 Isolate 结果与文中说明一致。完整 favorites_demo.dart 也通过静态分析和运行，输出见综合例子。注释中的错误示范没有解除注释运行。
+2026-11-25 首轮将正文的 18 个 dart 代码块分别提取到独立文件，全部通过 dart analyze 并运行成功；异步顺序、Stream 事件和 Isolate 结果与文中说明一致。完整 favorites_demo.dart 也通过静态分析和运行，输出见综合例子。注释中的错误示范没有解除注释运行。
+
+同日细节复查新增 7 个独立示例，补充常量身份、参数传递、惰性遍历、继承与属性、sealed 状态、异步循环和过期结果保护；新增示例全部通过静态分析与实际运行，正文目前共 25 个 dart 示例。同步核对了官方类修饰符与 Iterable.forEach 文档，并更新原文面试问答。未修改的首轮示例沿用上次验证结果。
 
 这些检查只覆盖 Windows 原生 Dart 命令行示例，不代表 Flutter 页面、Web 编译或真实网络/数据库场景已验证。未执行性能基准，也未将生成内容标为已掌握。
