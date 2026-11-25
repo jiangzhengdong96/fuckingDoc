@@ -33,7 +33,7 @@
 | [Debugging](./debugging/) | 记录调试方法论和调试工具技巧。这里偏通用排查能力，具体问题复盘放到 `troubleshooting/`。 | 0 |
 | [Dependency Management](./dependency-management/) | 记录依赖治理、版本冲突、BOM、升级策略和依赖风险控制。这里偏工程治理，`gradle/` 更偏 Gradle 语法和构建配置。 | 0 |
 | [Design Patterns](./design-patterns/) | 记录设计模式知识，覆盖创建型、结构型、行为型模式，以及它们在 Android 开发中的实践场景。 | 0 |
-| [Flutter](./flutter/) | 记录 Flutter 跨端开发知识，覆盖 Dart、Widget、状态管理、路由和平台通道。 | 0 |
+| [Flutter](./flutter/) | 记录 Flutter 跨端开发知识，覆盖 Dart、Widget、状态管理、路由和平台通道。先按学习路线建立全貌，再从 Dart 基础与可运行示例开始。 | 2 |
 | [Git](./git/) | 记录 Git 版本管理知识，覆盖分支、merge、rebase、stash、cherry-pick 和团队工作流。 | 0 |
 | [Gradle](./gradle/) | 记录 Gradle 和 Android Gradle Plugin 知识，覆盖基础语法、AGP、插件、依赖和构建缓存。 | 0 |
 | [Interview](./interview/) | 记录面试整理内容，覆盖 Android、Kotlin、Java、JVM 和项目问题。 | 0 |
