@@ -544,6 +544,171 @@ void main() {
 
 这里验证放在正常代码而非 assert 中，因此生产环境仍有效。getter/setter 不保证便宜或无副作用；设计 API 时应避免把很重的异步操作藏在看似普通的属性读取里。
 
+**mixin 能继承类吗？on 和 implements 又分别是什么？**
+
+这里按 Dart 3 的规则理解：`mixin C` 不能声明 `extends B`、`with Other` 或生成式构造函数；可以声明 `implements Contract`，也可以声明 `on B`。能被混入的类型通常用 mixin 或 mixin class 声明，不能把任意普通 class 都直接拿去 with。
+
+| 写法 | 含义 | 是否获得 B 的实现 |
+|---|---|---|
+| class A extends B | A 继承 B | 是 |
+| mixin C implements Contract | C 承诺接口；未实现的成员须由应用后的具体类提供 | 不继承 Contract 的实现 |
+| mixin C on B | 限制 C 应用前的超类类型必须满足 B，供 super 调用解析 | 不是 C 自己 extends B；实现来自实际混入链 |
+| class A extends B with C | 先有 B，再应用 C，最后是 A 自身成员 | A 同时获得继承与混入行为 |
+| mixin class C | 既可作为类继承/实例化，也可被 with 混入 | 自身不能写 extends、with、on 或生成式构造函数 |
+
+下面把接口要求、on 约束和 super 调用放进同一个例子：
+
+```dart
+abstract interface class Named {
+  String get name;
+}
+
+class B {
+  void save() => print('B.save');
+}
+
+mixin C on B implements Named {
+  @override
+  void save() {
+    print('C.before $name');
+    super.save();
+    print('C.after');
+  }
+}
+
+class A extends B with C {
+  @override
+  final String name;
+  A(this.name);
+}
+
+void main() {
+  A('Dart').save();
+}
+```
+
+执行顺序是 `C.before Dart → B.save → C.after`。C 没有实现 name，但最终的具体类 A 用字段生成的 getter 满足 Named；也可以由已有父类成员满足这个契约，并非必须在 A 中再写一遍。
+
+`on B` 要求的是**应用 C 时的超类类型为 B 的子类型**，不只是强制源码必须直接写 extends B。间接继承，或者之前应用的 mixin 已满足类型要求，也可能合法。若 C 用了 `super.save()`，该位置还必须提供兼容的具体实现；仅声明抽象方法不够。on 也不会自动帮你调用 B 的构造函数。如果只需要宿主提供 name 一类能力，抽象 getter 或 implements 通常更直接，不必为了类型限制滥用 on。
+
+**extends B 与 with C 的字段同名，会发生什么？**
+
+字段也会形成 getter；可写字段还会形成 setter，所以同名字段首先要按**成员覆盖与类型兼容**判断，不能简单理解成两份值合并。下面刻意让两处声明同名字段，观察普通访问与 super 访问：
+
+```dart
+class B {
+  String name = 'B';
+  String readName() => name;
+}
+
+mixin C on B {
+  @override
+  String name = 'C';
+  String readBaseName() => super.name;
+  void writeBaseName(String value) => super.name = value;
+}
+
+class A extends B with C {}
+
+void main() {
+  final a = A();
+  print(a.name);           // C
+  print(a.readName());     // C，B 的方法里普通 name 访问仍动态分派
+  print(a.readBaseName()); // B，显式 super 访问前一层实现
+  a.name = 'C2';
+  a.writeBaseName('B2');
+  print(a.name);           // C2
+  print(a.readBaseName()); // B2
+  print((a as B).name);    // C2，类型转换不会强行选 B 的字段访问器
+}
+```
+
+本例 B 和 C 的两个字段各有状态；C 覆盖同名访问器，但不是删除 B 的状态。避免在业务中依赖这种隐藏状态设计，优先重命名，或用抽象 getter 表示“共享同一份宿主状态”。如果 B.name 是 String 而 C.name 是 int，就不能因为“C 写在后面”而忽略类型错误。
+
+对于 `class A extends B with C, D`，可以按 `B → 应用 C → 应用 D → A` 理解成员查找：兼容的具体同名实现通常越靠右越优先，A 自己的覆盖再优先。super 指向混入链的前一层可用实现，不保证总是最初的 B。抽象成员不会凭空提供实现；getter/setter、final 字段也要分别看契约，不能将所有同名声明都套成“后者整个替换前者”。
+
+**隐式接口：为什么普通 class 也能被 implements？**
+
+Dart 每个类都会隐式定义接口，包含该类及其继承的实例成员契约；构造函数、static 成员不属于这份实例接口。可读字段形成 getter，可写字段还形成 setter，因此实现类未必需要使用同样的存储字段，也可以用访问器满足契约。
+
+```dart
+class ArticleSource {
+  final String label;
+  ArticleSource(this.label);
+  static const version = 1;
+  String load() => 'real data';
+}
+
+class FakeSource implements ArticleSource {
+  @override
+  String get label => 'fake';
+
+  @override
+  String load() => 'test data';
+}
+
+void main() {
+  final ArticleSource source = FakeSource();
+  print(source.label); // fake
+  print(source.load()); // test data
+}
+```
+
+FakeSource 不必复制 ArticleSource 的构造函数或 static version，却必须满足 label 与 load 的实例契约；implements 不复用 load 的原实现。原类新增实例成员，也可能让实现方需要跟着修改。含库私有成员的接口还涉及库边界，库外写同名 `_member` 并不等于实现原库的私有成员，不能保证任何类都方便在外部实现。
+
+**接口、抽象类、抽象接口怎么选？**
+
+Dart 没有单独的 Java 风格 `interface X {}` 声明；口语中的“接口”可能指任何类的隐式接口，也可能特指 `interface class`。以下表格讨论 Dart 3，并明确区分库内和库外：
+
+| 声明 | 本类能直接生成实例吗 | 能声明未实现的抽象成员吗 | 库外 extends | 库外 implements | 常见目的 |
+|---|---|---|---|---|---|
+| class X | 可以，有可用构造时 | 完整的具体类须满足全部成员实现要求 | 可以 | 可以 | 普通业务对象 |
+| abstract class X | 不可以直接生成 X 实例 | 可以，也能提供具体实现和字段 | 可以 | 可以 | 共享基础实现，让子类补齐部分能力 |
+| interface class X | 可以，有可用构造时 | 完整的具体类须满足全部成员实现要求 | 不可以 | 可以 | 提供可用实现，但库外只允许按契约替换 |
+| abstract interface class X | 不可以直接生成 X 实例 | 可以，也允许具体方法 | 不可以 | 可以 | 仓库、服务等面向调用方的契约 |
+
+abstract 限制直接实例化，interface 限制库外继承，是两个独立维度。abstract interface class 并不在语法上禁止具体方法，但实现者用 implements 时仍拿不到这些方法的实现。“纯接口”通常是把它写成只声明契约的设计习惯。抽象类型也可提供 factory 返回具体子类型，这不等于直接生成抽象类实例。
+
+interface 的继承限制针对**其他库**；同一个库内仍能继承 interface class。一般两个没有 part 关系的 Dart 文件就是两个库，即使在同一个 package 中也不等于同一库。只在一个文件中试验，容易误判这些跨库限制。
+
+**base：强制继承实现，不是强制重写每个方法。**
+
+base class 用于保证库外子类型走继承路线，保留基类的构造与实现，不能只写 implements 模拟同名接口。base 不禁止合法 override，也不会将所有方法变成 final。
+
+```dart
+base class BaseRepository {
+  final List<String> _cache = [];
+  void add(String value) => _cache.add(value);
+  int get count => _cache.length;
+}
+
+final class MemoryRepository extends BaseRepository {}
+
+base mixin Logging {
+  void log(String message) => print(message);
+}
+
+final class LoggedRepository extends BaseRepository with Logging {}
+
+void main() {
+  final repository = MemoryRepository()..add('Dart');
+  print(repository.count); // 1，继承了基类维护状态的实现
+  LoggedRepository().log('saved');
+}
+```
+
+- 库外可以 `extends BaseRepository`，不能 `implements BaseRepository`，即使准备手写全部方法也不行；同库内不受这条“禁止 implements”的库外限制。
+- 继承或实现 base 类型的类需要继续声明为 base、final 或 sealed，使限制沿子类型链传递；只写普通 `class Child extends BaseRepository` 会报错。需要抽象子类时可用 `abstract base class`。
+- `base mixin` 允许通过 with 复用实现，但禁止库外仅 implements 它；混入它的类也需使用 base、final 或 sealed。一个 mixin 若受 base 超类约束，也需要遵守 base 限制。
+- base 不保证应用一定会创建实例，不是生命周期管理，也不是“所有继承类必须重写方法”。要求子类补方法应使用 abstract 成员；要求库外继承而不是实现，用 base。
+
+例如另一库中的 `final class Wrong implements BaseRepository` 是非法的；这里即使加了 final 也无法绕过 base 的禁止库外实现规则。验证此规则必须把 BaseRepository 的声明和 Wrong 分在不同库中。
+
+**本节选择口诀：** 复用一个父类用 extends；承诺契约用 implements；复用横向能力用 mixin/with；混入时依赖超类实现用 on；要求库外保留实现继承关系用 base；只向库外开放契约实现用 abstract interface class。
+
+本次核对：2026-11-26，Dart 3.14.0。依据：[mixin、on 与 mixin class](https://dart.dev/language/mixins)、[隐式接口](https://dart.dev/language/classes#implicit-interfaces)、[类修饰符及库边界](https://dart.dev/language/class-modifiers)。上面的完整示例独立运行；库外限制另用分文件样例验证，不能把同库成功编译当作库外也允许。
+
+
 <a id="sealed-state"></a>
 ###### sealed 状态建模：避免多个布尔值组合出无效状态
 
