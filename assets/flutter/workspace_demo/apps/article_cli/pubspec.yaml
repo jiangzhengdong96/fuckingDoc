@@ -1,0 +1,8 @@
+name: article_cli
+version: 1.0.0
+publish_to: none
+environment:
+  sdk: ^3.6.0
+resolution: workspace
+dependencies:
+  article_core: ^1.0.0

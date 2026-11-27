@@ -1,0 +1,6 @@
+name: article_core
+version: 1.0.0
+publish_to: none
+environment:
+  sdk: ^3.6.0
+resolution: workspace

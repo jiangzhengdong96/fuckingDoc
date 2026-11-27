@@ -47,6 +47,8 @@
 5. 学 [Future 的执行顺序](./Dart基础详解.md#future)、[Stream](./Dart基础详解.md#stream)、[Isolate](./Dart基础详解.md#isolate)，区分异步等待与 CPU 并行。
 6. 跟完 [收藏列表综合例子](./Dart基础详解.md#example)，再开始 Flutter 页面。
 
+准备拆分模型、公共逻辑或多个应用时，继续阅读 [Dart 包、库与工作区详解](./Dart包库与工作区详解.md)，先区分依赖边界与库私有边界。
+
 Records、模式匹配和类修饰符先能读懂即可；初学不需要先研究编译器状态机、框架源码或全部第三方状态库。
 
 <a id="project"></a>
