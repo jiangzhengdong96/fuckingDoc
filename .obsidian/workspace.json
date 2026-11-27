@@ -4,35 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "8467b919a68d6b0e",
+        "id": "f92779c5eb0e20d5",
         "type": "tabs",
         "children": [
           {
-            "id": "140007385d467816",
+            "id": "6c0c62d321e38aea",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/flutter/Dart基础详解.md",
+                "file": "docs/flutter/Flutter学习路线.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Dart基础详解"
-            }
-          },
-          {
-            "id": "1fdac9e15925e972",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "docs/flutter/小计.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "小计"
+              "title": "Flutter学习路线"
             }
           }
         ]
@@ -94,8 +80,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200,
-    "collapsed": true
+    "width": 200
   },
   "right": {
     "id": "8dc9194a009e8c5e",
@@ -173,7 +158,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "docs/flutter/Dart基础详解.md",
+                "file": "docs/flutter/Flutter学习路线.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -200,14 +185,22 @@
       "bases:新建数据库": false
     }
   },
-  "active": "140007385d467816",
+  "active": "6c0c62d321e38aea",
   "lastOpenFiles": [
+    "docs/flutter/Dart包库与工作区详解.md",
     "docs/flutter/小计.md",
     "docs/flutter/Dart基础详解.md",
+    "assets/flutter/workspace_demo/pubspec.lock",
+    "assets/flutter/workspace_demo/packages/article_core/lib/src/article.dart",
+    "assets/flutter/workspace_demo/packages/article_core/lib/src",
+    "assets/flutter/workspace_demo/packages/article_core/lib/article_core.dart",
+    "assets/flutter/workspace_demo/apps/article_cli/bin/main.dart",
+    "assets/flutter/workspace_demo/packages/article_core/pubspec.yaml",
+    "assets/flutter/workspace_demo/packages/article_core/lib",
+    "assets/flutter/workspace_demo/apps/article_cli/pubspec.yaml",
+    "assets/flutter/workspace_demo/apps/article_cli/bin",
+    "assets/flutter/workspace_demo/packages/article_core",
     "docs/java/知识点梳理/面向对象.md",
-    "assets/flutter/dart-basics/favorites_demo.dart",
-    "assets/flutter/dart-basics",
-    "assets/flutter",
     "docs/flutter/Flutter学习路线.md",
     "docs/flutter/README.md",
     "docs/design-patterns/README.md",
@@ -231,15 +224,6 @@
     "docs/coroutine/知识点梳理/挂起函数与状态机场景详解.md",
     "docs/coroutine/知识点梳理/小计.md",
     "docs/coroutine/知识点梳理/协程并发控制与共享状态.md",
-    "docs/coroutine/知识点梳理/协程和传统方案对比.md",
-    "docs/coroutine/知识点梳理/协程核心对象和底层实现.md",
-    "scripts/tests/__pycache__/test_knowledge_hook.cpython-312.pyc",
-    "scripts/tests/test_knowledge_hook.py",
-    "scripts/__pycache__/check-links.cpython-312.pyc",
-    "scripts/tests/__pycache__/test_check_links.cpython-312.pyc",
-    "scripts/tests/__pycache__",
-    "scripts/tests/test_check_links.py",
-    "scripts/tests",
     "Pasted image 20261008162316.png",
     "Pasted image 20261008162258.png",
     "Pasted image 20261008161837.png",
